@@ -122,6 +122,7 @@ const ChatScreen = ({ messages, chat }) => {
         <input
           className="flex-1 items-center p-[10px] sticky bg-white z-100 mx-[15px]"
           value={input}
+          placeholder="Bark here"
           onChange={(e) => setInput(e.target.value)}
         />
         <button hidden disabled={!input} type="submit" onClick={sendMessage}>

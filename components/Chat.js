@@ -25,7 +25,7 @@ function Chat({ id, users }) {
   return (
     <div
       onClick={enterChat}
-      className="flex align-center cursor-pointer p-[15px] break-words"
+      className="flex align-center items-center space-x-4 cursor-pointer p-[15px] break-words"
     >
       {recipient ? (
         <Avatar src={recipient?.photoURL} />
