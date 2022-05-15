@@ -2,9 +2,11 @@ import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import 'firebase/compat/firestore'
 
+// whatsapp-1759a.firebaseapp.com
+
 const firebaseConfig = {
   apiKey: 'AIzaSyBYLEbBput1TtFaDw3w8gukA_ipLnqaNxY',
-  authDomain: 'whatsapp-1759a.firebaseapp.com',
+  authDomain: 'bark.com',
   projectId: 'whatsapp-1759a',
   storageBucket: 'whatsapp-1759a.appspot.com',
   messagingSenderId: '1026354187533',
