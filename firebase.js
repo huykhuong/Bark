@@ -6,7 +6,7 @@ import 'firebase/compat/firestore'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBYLEbBput1TtFaDw3w8gukA_ipLnqaNxY',
-  authDomain: 'bark.com',
+  authDomain: 'https://bark-eight.vercel.app/',
   projectId: 'whatsapp-1759a',
   storageBucket: 'whatsapp-1759a.appspot.com',
   messagingSenderId: '1026354187533',
