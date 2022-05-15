@@ -4,9 +4,11 @@ import 'firebase/compat/firestore'
 
 // whatsapp-1759a.firebaseapp.com
 
+// https://bark-eight.vercel.app/
+
 const firebaseConfig = {
   apiKey: 'AIzaSyBYLEbBput1TtFaDw3w8gukA_ipLnqaNxY',
-  authDomain: 'https://bark-eight.vercel.app/',
+  authDomain: 'bark-eight.vercel.app',
   projectId: 'whatsapp-1759a',
   storageBucket: 'whatsapp-1759a.appspot.com',
   messagingSenderId: '1026354187533',
