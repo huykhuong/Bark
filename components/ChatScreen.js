@@ -12,11 +12,13 @@ import { serverTimestamp } from 'firebase/firestore'
 import getRecipientEmail from '../utils/getRecipientEmail'
 import { Avatar } from '@material-ui/core'
 import TimeAgo from 'timeago-react'
+import { isSameSender, isSameSenderMargin } from '../utils/chatLogics'
 
 const ChatScreen = ({ messages, chat }) => {
   const [user] = useAuthState(auth)
   const endOfMessageRef = useRef()
   const [input, setInput] = useState('')
+  const [username, setUsername] = useState(JSON.parse(messages)[0].user)
   const router = useRouter()
   const [messagesSnapshot] = useCollection(
     db
@@ -66,33 +68,41 @@ const ChatScreen = ({ messages, chat }) => {
 
   const showMessages = () => {
     if (messagesSnapshot) {
-      return messagesSnapshot.docs.map((message) => (
-        <div>
-          <Message
-            key={message.id}
-            user={message.data().user}
-            message={{
-              ...message.data(),
-              timestamp: message.data().timestamp?.toDate().getTime(),
+      return messagesSnapshot.docs.map((message, index) => (
+        <div
+          className={`${
+            isSameSender(JSON.parse(messages), message, index, user.email) &&
+            'flex items-end'
+          }`}
+          key={message.id}
+        >
+          {isSameSender(JSON.parse(messages), message, index, user.email) &&
+            chat.type !== 'DM' && (
+              <Avatar src={message.data().photoURL}></Avatar>
+            )}
+          <div
+            style={{
+              marginLeft: isSameSenderMargin(
+                JSON.parse(messages),
+                message,
+                index,
+                user.email
+              ),
             }}
-          />
-          <Avatar
-            className="inline-block"
-            src={message.data().photoURL}
-          ></Avatar>
+          >
+            <Message
+              user={message.data().user}
+              message={{
+                ...message.data(),
+                timestamp: message.data().timestamp?.toDate().getTime(),
+              }}
+            />
+          </div>
         </div>
       ))
     } else {
       return JSON.parse(messages).map((message) => (
-        <div className="flex">
-          <Avatar src={message.photoURL}></Avatar>
-          <Message
-            key={message.id}
-            message={message}
-            user={message.user}
-            chat_type={chat.type}
-          />
-        </div>
+        <Message key={message.id} message={message} user={message.user} />
       ))
     }
   }

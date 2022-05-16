@@ -7,9 +7,9 @@ const Message = ({ user, message, chat_type }) => {
   const [userLoggedIn] = useAuthState(auth)
 
   const generalMessageStyle =
-    'w-fit p-[15px] rounded-[8px] m-[10px] min-w-[60px] pb-[26px] relative'
+    'w-fit p-[15px] rounded-[8px] mt-[10px] ml-[10px] min-w-[60px] pb-[26px] relative'
 
-  const senderStyle = 'ml-auto bg-[#dcf8c6]'
+  const senderStyle = '!ml-auto bg-[#dcf8c6]'
   const receiverStyle = 'text-left bg-blue-200'
 
   return (
