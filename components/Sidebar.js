@@ -20,11 +20,11 @@ const sidebar = () => {
 
   const styles = {
     container: '',
-    brand: 'text-2xl p-[15px] mb-20',
+    brand: 'text-2xl p-[15px]',
     header:
       'flex sticky top-0 bg-white justify-between items-center z-1 p-[15px] h-[80px] border-b-[1px] border-b-whitesmoke',
     avatar: 'cursor-pointer hover:opacity-80',
-    search: 'flex rounded-[2px] p-20 pl-[15px] items-center space-x-5',
+    search: 'flex rounded-[2px] p-10 pl-[15px] items-center space-x-5 mb-10',
   }
 
   const createChat = () => {
@@ -44,6 +44,25 @@ const sidebar = () => {
     }
   }
 
+  const createGroupChat = () => {
+    const input = prompt(
+      'Please enter the email addresses you want to chat with, please separate each email with a comma'
+    )
+    const chat_name = prompt('Please enter a chat name')
+    if (!input) return null
+    if (!chat_name) return null
+
+    if (!input.includes(user.email)) {
+      const modifiedArray = input.split(' ').join('')
+      const userArray = modifiedArray.split(',')
+      userArray.push(user.email)
+      db.collection('chats').add({
+        users: userArray,
+        chat_name: chat_name,
+      })
+    }
+  }
+
   const chatAlreadyExists = (recipientEmail) =>
     !!chatsSnapshot?.docs.find(
       (chat) =>
@@ -52,7 +71,11 @@ const sidebar = () => {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.brand}>Bark</h1>
+      <div className="flex items-center align-middle mb-[50px] p-5">
+        <img className="h-[50px] w-[50px]" src="/bark.svg" />
+        <h1 className={styles.brand}>Bark</h1>
+      </div>
+
       <div className={styles.header}>
         <Avatar
           src={user.photoURL}
@@ -68,6 +91,7 @@ const sidebar = () => {
           </IconButton>
         </div>
       </div>
+
       <div className={styles.search}>
         <SearchIcon />
         <input
@@ -77,9 +101,16 @@ const sidebar = () => {
           onChange={(e) => setSearchInput(e.target.value)}
         />
       </div>
-      <Button onClick={createChat} className="w-full">
-        Start a new chat
-      </Button>
+
+      <div className="flex mb-10">
+        <Button onClick={createChat} className="text-white basis-1/2">
+          Start a new bark
+        </Button>
+        <Button onClick={createGroupChat} className="basis-1/2">
+          Start a new bark group
+        </Button>
+      </div>
+
       {chatsSnapshot?.docs
         .filter((chat) => {
           if (searchInput === '') {
@@ -93,7 +124,19 @@ const sidebar = () => {
           }
         })
         .map((chat) => {
-          return <Chat key={chat.id} id={chat.id} users={chat.data().users} />
+          return (
+            <Chat
+              key={chat.id}
+              id={chat.id}
+              users={chat.data().users}
+              chat_name={
+                chat.data().type === 'group' ? chat.data().chat_name : ''
+              }
+              chat_img_url={
+                chat.data().type === 'group' ? chat.data().group_img_url : ''
+              }
+            />
+          )
         })}
     </div>
   )

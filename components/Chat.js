@@ -6,7 +6,7 @@ import { useAuthState } from 'react-firebase-hooks/auth'
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { useRouter } from 'next/router'
 
-function Chat({ id, users }) {
+function Chat({ id, users, chat_name, chat_img_url }) {
   const [user] = useAuthState(auth)
   const router = useRouter()
 
@@ -27,12 +27,15 @@ function Chat({ id, users }) {
       onClick={enterChat}
       className="flex align-center items-center space-x-4 cursor-pointer p-[15px] break-words"
     >
-      {recipient ? (
+      {recipient && users.length <= 2 ? (
         <Avatar src={recipient?.photoURL} />
-      ) : (
+      ) : !recipient && users.length <= 2 ? (
         <Avatar>{recipientEmail[0]}</Avatar>
+      ) : (
+        <img className="rounded-full w-10 h-10" src={chat_img_url} />
+        // <Avatar src={chat_img_url} />
       )}
-      <p>{recipientEmail}</p>
+      {chat_name !== '' ? <p>{chat_name}</p> : <p>{recipientEmail}</p>}
     </div>
   )
 }

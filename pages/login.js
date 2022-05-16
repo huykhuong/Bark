@@ -14,10 +14,7 @@ const Login = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="flex flex-col p-[100px] items-center bg-white shadow-lg">
-        <img
-          className="h-[200px] w-[200px] mb-[50px]"
-          src="http://assets.stickpng.com/images/580b57fcd9996e24bc43c543.png"
-        />
+        <img className="h-[200px] w-[200px] mb-[50px]" src="/bark.svg" />
         <button onClick={signIn} className="">
           Sign in with google
         </button>

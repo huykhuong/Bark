@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { auth, db } from '../firebase'
 import { useRouter } from 'next/router'
@@ -33,6 +33,10 @@ const ChatScreen = ({ messages, chat }) => {
     })
   }
 
+  useEffect(() => {
+    scrollToBottom()
+  }, [router.asPath])
+
   const sendMessage = (e) => {
     e.preventDefault()
 
@@ -63,18 +67,32 @@ const ChatScreen = ({ messages, chat }) => {
   const showMessages = () => {
     if (messagesSnapshot) {
       return messagesSnapshot.docs.map((message) => (
-        <Message
-          key={message.id}
-          user={message.data().user}
-          message={{
-            ...message.data(),
-            timestamp: message.data().timestamp?.toDate().getTime(),
-          }}
-        />
+        <div>
+          <Message
+            key={message.id}
+            user={message.data().user}
+            message={{
+              ...message.data(),
+              timestamp: message.data().timestamp?.toDate().getTime(),
+            }}
+          />
+          <Avatar
+            className="inline-block"
+            src={message.data().photoURL}
+          ></Avatar>
+        </div>
       ))
     } else {
       return JSON.parse(messages).map((message) => (
-        <Message key={message.id} message={message} user={message.user} />
+        <div className="flex">
+          <Avatar src={message.photoURL}></Avatar>
+          <Message
+            key={message.id}
+            message={message}
+            user={message.user}
+            chat_type={chat.type}
+          />
+        </div>
       ))
     }
   }
@@ -84,14 +102,19 @@ const ChatScreen = ({ messages, chat }) => {
 
   return (
     <div className="">
-      <div className="sticky bg-white z-100 top-0 flex p-[11px] h-[80px] items-center border-b border-solid border-white">
-        {recipient ? (
+      <div className="sticky z-10 bg-gray-100 z-100 top-0 flex p-[11px] h-[80px] items-center border-b border-solid border-white">
+        {recipient && chat.users.length <= 2 ? (
           <Avatar src={recipient?.photoURL} />
+        ) : !recipient && chat.users.length <= 2 ? (
+          <Avatar>{recipientEmail[0]}</Avatar>
         ) : (
-          <Avatar src={recipientEmail?.[0]} />
+          <img className="rounded-full w-10 h-10" src={chat.group_img_url} />
+          // <Avatar src={chat_img_url} />
         )}
         <div className="ml-[15px] flex-1">
-          <h3>{recipientEmail}</h3>
+          <h3 className="font-bold text-lg">
+            {chat.chat_name ? chat.chat_name : recipientEmail}
+          </h3>
           {recipientSnapshot ? (
             <p>
               Last active: {''}{' '}
