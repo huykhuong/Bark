@@ -19,7 +19,6 @@ const sidebar = () => {
   const [chatsSnapshot] = useCollection(chatRef)
 
   const styles = {
-    container: '',
     brand: 'text-2xl p-[15px]',
     header:
       'flex sticky top-0 bg-white justify-between items-center z-1 p-[15px] h-[80px] border-b-[1px] border-b-whitesmoke',
@@ -70,7 +69,7 @@ const sidebar = () => {
     )
 
   return (
-    <div className={styles.container}>
+    <div className="">
       <div className="flex items-center align-middle mb-[50px] p-5">
         <img className="h-[50px] w-[50px]" src="/bark.svg" />
         <h1 className={styles.brand}>Bark</h1>

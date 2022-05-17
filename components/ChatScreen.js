@@ -12,13 +12,16 @@ import { serverTimestamp } from 'firebase/firestore'
 import getRecipientEmail from '../utils/getRecipientEmail'
 import { Avatar } from '@material-ui/core'
 import TimeAgo from 'timeago-react'
-import { isSameSender, isSameSenderMargin } from '../utils/chatLogics'
+import {
+  isLastMessage,
+  isSameSender,
+  isSameSenderMargin,
+} from '../utils/chatLogics'
 
 const ChatScreen = ({ messages, chat }) => {
   const [user] = useAuthState(auth)
   const endOfMessageRef = useRef()
   const [input, setInput] = useState('')
-  const [username, setUsername] = useState(JSON.parse(messages)[0].user)
   const router = useRouter()
   const [messagesSnapshot] = useCollection(
     db
@@ -27,6 +30,11 @@ const ChatScreen = ({ messages, chat }) => {
       .collection('messages')
       .orderBy('timestamp', 'asc')
   )
+  const bark_audio = new Audio('/bark_SFX.wav')
+
+  const triggerBarkSound = () => {
+    bark_audio.play()
+  }
 
   const scrollToBottom = () => {
     endOfMessageRef.current.scrollIntoView({
@@ -39,6 +47,7 @@ const ChatScreen = ({ messages, chat }) => {
     scrollToBottom()
   }, [router.asPath])
 
+  //send message function
   const sendMessage = (e) => {
     e.preventDefault()
 
@@ -55,7 +64,7 @@ const ChatScreen = ({ messages, chat }) => {
       user: user.email,
       photoURL: user.photoURL,
     })
-
+    triggerBarkSound()
     setInput('')
     scrollToBottom()
   }
@@ -69,17 +78,11 @@ const ChatScreen = ({ messages, chat }) => {
   const showMessages = () => {
     if (messagesSnapshot) {
       return messagesSnapshot.docs.map((message, index) => (
-        <div
-          className={`${
-            isSameSender(JSON.parse(messages), message, index, user.email) &&
-            'flex items-end'
-          }`}
-          key={message.id}
-        >
-          {isSameSender(JSON.parse(messages), message, index, user.email) &&
-            chat.type !== 'DM' && (
-              <Avatar src={message.data().photoURL}></Avatar>
-            )}
+        <div className={`flex items-end`} key={message.id}>
+          {(isSameSender(JSON.parse(messages), message, index, user.email) ||
+            isLastMessage(JSON.parse(messages), index, user.email)) && (
+            <Avatar src={message.data().photoURL}></Avatar>
+          )}
           <div
             style={{
               marginLeft: isSameSenderMargin(
@@ -112,7 +115,7 @@ const ChatScreen = ({ messages, chat }) => {
 
   return (
     <div className="">
-      <div className="sticky z-10 bg-gray-100 z-100 top-0 flex p-[11px] h-[80px] items-center border-b border-solid border-white">
+      <div className="sticky z-10 bg-gray-100 top-0 flex p-[11px] h-[80px] items-center border-b border-solid border-white">
         {recipient && chat.users.length <= 2 ? (
           <Avatar src={recipient?.photoURL} />
         ) : !recipient && chat.users.length <= 2 ? (
@@ -144,7 +147,7 @@ const ChatScreen = ({ messages, chat }) => {
         </div>
       </div>
 
-      <div className="p-[30px] min-h-[49rem]">
+      <div className="p-[30px] ">
         {showMessages()}
         {/* End of message */}
         <div className="mb-[50px]" ref={endOfMessageRef}></div>

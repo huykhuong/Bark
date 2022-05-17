@@ -12,7 +12,12 @@ const ChatPage = ({ messages, chat }) => {
   return (
     <div className="flex">
       <Head>
-        <title>Chat with {getRecipientEmail(chat.users, user)}</title>
+        <title>
+          Chat with{' '}
+          {chat.type === 'group'
+            ? chat.chat_name + ' group'
+            : getRecipientEmail(chat.users, user)}
+        </title>
       </Head>
       <Sidebar />
       <div className="flex-1 overflow-scroll h-screen">
