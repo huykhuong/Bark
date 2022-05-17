@@ -7,11 +7,15 @@ export const isSameSender = (messages, m, i, userLoggedIn) => {
   )
 }
 
+export const isSameUser = (messages, m, i) => {
+  return i > 0 && messages[i - 1].user === m.data().user
+}
+
 export const isLastMessage = (messages, i, userId) => {
   return (
     i === messages.length - 1 &&
-    messages[messages.length - 1].user !== userId &&
-    messages[messages.length - 1].user
+    messages[messages.length - 1].data().user !== userId &&
+    messages[messages.length - 1].data().user
   )
 }
 
@@ -20,16 +24,15 @@ export const isSameSenderMargin = (messages, m, i, userId) => {
 
   if (
     i < messages.length - 1 &&
-    messages[i + 1].user === m.data().user &&
-    messages[i].user !== userId
+    messages[i + 1].data().user === m.data().user &&
+    messages[i].data().user !== userId
   )
     return 40
   else if (
     (i < messages.length - 1 &&
-      messages[i + 1].user !== m.data().user &&
-      messages[i].user !== userId) ||
-    (i === messages.length - 1 && messages[i].user !== userId)
+      messages[i + 1].data().user !== m.data().user &&
+      messages[i].data().user !== userId) ||
+    (i === messages.length - 1 && messages[i].data().user !== userId)
   )
     return 0
-  else return 'auto'
 }

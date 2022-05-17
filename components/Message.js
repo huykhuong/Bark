@@ -9,7 +9,7 @@ const Message = ({ user, message, chat_type }) => {
   const generalMessageStyle =
     'w-fit p-[15px] rounded-[8px] mt-[10px] ml-[10px] min-w-[60px] pb-[26px] relative'
 
-  const senderStyle = '!ml-auto bg-[#dcf8c6]'
+  const senderStyle = 'bg-[#dcf8c6]'
   const receiverStyle = 'text-left bg-blue-200'
 
   return (

@@ -13,7 +13,7 @@ const ChatPage = ({ messages, chat }) => {
     <div className="flex">
       <Head>
         <title>
-          Chat with{' '}
+          Barking with{' '}
           {chat.type === 'group'
             ? chat.chat_name + ' group'
             : getRecipientEmail(chat.users, user)}

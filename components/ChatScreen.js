@@ -80,22 +80,27 @@ const ChatScreen = ({ messages, chat }) => {
       return messagesSnapshot.docs.map((message, index) => (
         <div className={`flex items-end`} key={message.id}>
           {(isSameSender(JSON.parse(messages), message, index, user.email) ||
-            isLastMessage(JSON.parse(messages), index, user.email)) && (
+            isLastMessage(messagesSnapshot.docs, index, user.email)) && (
             <Avatar src={message.data().photoURL}></Avatar>
           )}
           <div
             style={{
               marginLeft: isSameSenderMargin(
-                JSON.parse(messages),
+                messagesSnapshot.docs,
                 message,
                 index,
                 user.email
               ),
             }}
+            className={`${user.email === message.data().user && 'ml-auto'}`}
           >
             {!isSameSender(JSON.parse(messages), message, index, user.email) &&
               message.data().user !== user.email &&
-              chat.type === 'group' && <p>{message.data().user}</p>}
+              chat.type === 'group' && (
+                <p className="ml-[12px] text-sm text-gray-600">
+                  {message.data().user}
+                </p>
+              )}
             <Message
               user={message.data().user}
               message={{
