@@ -69,7 +69,7 @@ const sidebar = () => {
     )
 
   return (
-    <div className="">
+    <div className="max-h-screen overflow-scroll">
       <div className="flex items-center align-middle mb-[50px] p-5">
         <img className="h-[50px] w-[50px]" src="/bark.svg" />
         <h1 className={styles.brand}>Bark</h1>

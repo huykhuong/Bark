@@ -14,29 +14,16 @@ const Message = ({ user, message, chat_type }) => {
 
   return (
     <div>
-      {chat_type === 'DM' ? (
-        <p
-          className={`${generalMessageStyle} ${
-            userLoggedIn.email === user ? senderStyle : receiverStyle
-          }`}
-        >
-          {message.message}
-          <span className="text-gray p-[10px] text-[9px] absolute bottom-0 text-right right-0">
-            {message.timestamp ? moment(message.timestamp).format('LT') : '...'}
-          </span>
-        </p>
-      ) : (
-        <p
-          className={`${generalMessageStyle} ${
-            userLoggedIn.email === user ? senderStyle : receiverStyle
-          }`}
-        >
-          {message.message}
-          <span className="text-gray p-[10px] text-[9px] absolute bottom-0 text-right right-0">
-            {message.timestamp ? moment(message.timestamp).format('LT') : '...'}
-          </span>
-        </p>
-      )}
+      <p
+        className={`${generalMessageStyle} ${
+          userLoggedIn.email === user ? senderStyle : receiverStyle
+        }`}
+      >
+        {message.message}
+        <span className="text-gray p-[10px] text-[9px] absolute bottom-0 text-right right-0">
+          {message.timestamp ? moment(message.timestamp).format('LT') : '...'}
+        </span>
+      </p>
     </div>
   )
 }

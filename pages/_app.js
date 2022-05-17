@@ -24,11 +24,7 @@ function MyApp({ Component, pageProps }) {
 
   if (loading) return <Loading />
   if (!user) return <Login />
-  return (
-    <div className="h-[100vh] overflow-hidden">
-      <Component {...pageProps} />
-    </div>
-  )
+  return <Component {...pageProps} />
 }
 
 export default MyApp

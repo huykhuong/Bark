@@ -93,6 +93,9 @@ const ChatScreen = ({ messages, chat }) => {
               ),
             }}
           >
+            {!isSameSender(JSON.parse(messages), message, index, user.email) &&
+              message.data().user !== user.email &&
+              chat.type === 'group' && <p>{message.data().user}</p>}
             <Message
               user={message.data().user}
               message={{
