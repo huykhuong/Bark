@@ -17,11 +17,14 @@ import {
   isSameSender,
   isSameSenderMargin,
 } from '../utils/chatLogics'
+import dynamic from 'next/dynamic'
+const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false })
 
 const ChatScreen = ({ messages, chat }) => {
   const [user] = useAuthState(auth)
   const endOfMessageRef = useRef()
   const [input, setInput] = useState('')
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const router = useRouter()
   const [messagesSnapshot] = useCollection(
     db
@@ -118,11 +121,17 @@ const ChatScreen = ({ messages, chat }) => {
     }
   }
 
+  // Emoji Pick Function
+  const emojiPick = (e, emojiObject) => {
+    setInput((prevValue) => prevValue + emojiObject.emoji)
+    setShowEmojiPicker(false)
+  }
+
   const recipient = recipientSnapshot?.docs?.[0]?.data()
   const recipientEmail = getRecipientEmail(chat.users, user)
 
   return (
-    <div className="">
+    <div>
       <div className="sticky z-10 bg-gray-100 top-0 flex p-[11px] h-[80px] items-center border-b border-solid border-white">
         {recipient && chat.users.length <= 2 ? (
           <Avatar src={recipient?.photoURL} />
@@ -161,8 +170,17 @@ const ChatScreen = ({ messages, chat }) => {
         <div className="mb-[50px]" ref={endOfMessageRef}></div>
       </div>
 
+      {/* Send message box */}
+      {showEmojiPicker && (
+        <Picker
+          pickerStyle={{ width: '40%', position: 'fixed', bottom: 80 }}
+          onEmojiClick={emojiPick}
+        />
+      )}
       <form className="flex items-center p-[10px] sticky bottom-0 bg-white z-100">
-        <InsertEmoticonIcon />
+        <InsertEmoticonIcon
+          onClick={() => setShowEmojiPicker((value) => !value)}
+        />
         <input
           className="flex-1 items-center p-[10px] sticky bg-white z-100 mx-[15px]"
           value={input}
