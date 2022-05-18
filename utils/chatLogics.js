@@ -1,14 +1,14 @@
 export const isSameSender = (messages, m, i, userLoggedIn) => {
   return (
     i < messages.length - 1 &&
-    (messages[i + 1].user !== m.data().user ||
-      messages[i + 1].user === undefined) &&
-    messages[i].user !== userLoggedIn
+    (messages[i + 1].data().user !== m.data().user ||
+      messages[i + 1].data().user === undefined) &&
+    messages[i].data().user !== userLoggedIn
   )
 }
 
 export const isSameUser = (messages, m, i) => {
-  return i > 0 && messages[i - 1].user === m.data().user
+  return i > 0 && messages[i - 1].data().user === m.data().user
 }
 
 export const isLastMessage = (messages, i, userId) => {

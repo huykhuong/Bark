@@ -16,6 +16,7 @@ import {
   isLastMessage,
   isSameSender,
   isSameSenderMargin,
+  isSameUser,
 } from '../utils/chatLogics'
 import dynamic from 'next/dynamic'
 const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false })
@@ -82,7 +83,7 @@ const ChatScreen = ({ messages, chat }) => {
     if (messagesSnapshot) {
       return messagesSnapshot.docs.map((message, index) => (
         <div className={`flex items-end`} key={message.id}>
-          {(isSameSender(JSON.parse(messages), message, index, user.email) ||
+          {(isSameSender(messagesSnapshot.docs, message, index, user.email) ||
             isLastMessage(messagesSnapshot.docs, index, user.email)) && (
             <Avatar src={message.data().photoURL}></Avatar>
           )}
@@ -97,7 +98,7 @@ const ChatScreen = ({ messages, chat }) => {
             }}
             className={`${user.email === message.data().user && 'ml-auto'}`}
           >
-            {!isSameSender(JSON.parse(messages), message, index, user.email) &&
+            {!isSameUser(messagesSnapshot.docs, message, index, user.email) &&
               message.data().user !== user.email &&
               chat.type === 'group' && (
                 <p className="ml-[12px] text-sm text-gray-600">
@@ -124,14 +125,13 @@ const ChatScreen = ({ messages, chat }) => {
   // Emoji Pick Function
   const emojiPick = (e, emojiObject) => {
     setInput((prevValue) => prevValue + emojiObject.emoji)
-    setShowEmojiPicker(false)
   }
 
   const recipient = recipientSnapshot?.docs?.[0]?.data()
   const recipientEmail = getRecipientEmail(chat.users, user)
 
   return (
-    <div>
+    <div className="">
       <div className="sticky z-10 bg-gray-100 top-0 flex p-[11px] h-[80px] items-center border-b border-solid border-white">
         {recipient && chat.users.length <= 2 ? (
           <Avatar src={recipient?.photoURL} />
@@ -179,6 +179,7 @@ const ChatScreen = ({ messages, chat }) => {
       )}
       <form className="flex items-center p-[10px] sticky bottom-0 bg-white z-100">
         <InsertEmoticonIcon
+          className="cursor-pointer"
           onClick={() => setShowEmojiPicker((value) => !value)}
         />
         <input
