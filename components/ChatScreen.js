@@ -95,6 +95,14 @@ const ChatScreen = ({ messages, chat }) => {
                 index,
                 user.email
               ),
+              marginTop: isSameUser(
+                messagesSnapshot.docs,
+                message,
+                index,
+                user.email
+              )
+                ? 0
+                : 60,
             }}
             className={`${user.email === message.data().user && 'ml-auto'}`}
           >
@@ -131,7 +139,7 @@ const ChatScreen = ({ messages, chat }) => {
   const recipientEmail = getRecipientEmail(chat.users, user)
 
   return (
-    <div className="">
+    <div className="scrollbar-hide">
       <div className="sticky z-10 bg-gray-100 top-0 flex p-[11px] h-[80px] items-center border-b border-solid border-white">
         {recipient && chat.users.length <= 2 ? (
           <Avatar src={recipient?.photoURL} />
@@ -177,7 +185,7 @@ const ChatScreen = ({ messages, chat }) => {
           onEmojiClick={emojiPick}
         />
       )}
-      <form className="flex items-center p-[10px] sticky bottom-0 bg-white z-100">
+      <form className="flex items-center w-[calc(100vw-388.625px)] p-[10px] fixed bottom-0 bg-white z-100">
         <InsertEmoticonIcon
           className="cursor-pointer"
           onClick={() => setShowEmojiPicker((value) => !value)}

@@ -39,6 +39,7 @@ const sidebar = () => {
     ) {
       db.collection('chats').add({
         users: [user.email, input],
+        type: 'DM',
       })
     }
   }
@@ -65,11 +66,12 @@ const sidebar = () => {
   const chatAlreadyExists = (recipientEmail) =>
     !!chatsSnapshot?.docs.find(
       (chat) =>
-        chat.data().users.find((user) => user === recipientEmail)?.length > 0
+        chat.data().users.find((user) => user === recipientEmail)?.length > 0 &&
+        chat.type === 'DM'
     )
 
   return (
-    <div className="max-h-screen overflow-scroll">
+    <div className="max-h-screen overflow-scroll scrollbar-hide">
       <div className="flex items-center align-middle mb-[50px] p-5">
         <img className="h-[50px] w-[50px]" src="/bark.svg" />
         <h1 className={styles.brand}>Bark</h1>
