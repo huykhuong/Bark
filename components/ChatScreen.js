@@ -17,6 +17,7 @@ import {
   isSameSender,
   isSameSenderMargin,
   isSameUser,
+  renderNickname,
 } from '../utils/chatLogics'
 import dynamic from 'next/dynamic'
 const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false })
@@ -34,6 +35,9 @@ const ChatScreen = ({ messages, chat }) => {
       .collection('messages')
       .orderBy('timestamp', 'asc')
   )
+
+  const nicknamesArray = chat.nicknames
+
   const bark_audio = new Audio('/bark_SFX.wav')
 
   const triggerBarkSound = () => {
@@ -110,7 +114,7 @@ const ChatScreen = ({ messages, chat }) => {
               message.data().user !== user.email &&
               chat.type === 'group' && (
                 <p className="ml-[12px] text-sm text-gray-600">
-                  {message.data().user}
+                  {renderNickname(nicknamesArray, message.data().user)}
                 </p>
               )}
             <Message

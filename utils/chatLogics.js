@@ -36,3 +36,14 @@ export const isSameSenderMargin = (messages, m, i, userId) => {
   )
     return 0
 }
+
+export const renderNickname = (nicknamesArray, sender_username) => {
+  let nickname = ''
+  nicknamesArray.forEach((object, index) => {
+    if (object.user === sender_username && object.nickname !== '') {
+      nickname = object.nickname
+    } else if (object.user === sender_username && object.nickname === '')
+      nickname = object.user
+  })
+  return nickname
+}

@@ -23,7 +23,7 @@ const sidebar = () => {
     header:
       'flex sticky top-0 bg-white justify-between items-center z-1 p-[15px] h-[80px] border-b-[1px] border-b-whitesmoke',
     avatar: 'cursor-pointer hover:opacity-80',
-    search: 'flex rounded-[2px] p-10 pl-[15px] items-center space-x-5 mb-10',
+    search: 'flex rounded-[2px] p-10 pl-[15px] items-center mb-10',
   }
 
   const createChat = () => {
@@ -56,10 +56,25 @@ const sidebar = () => {
       const modifiedArray = input.split(' ').join('')
       const userArray = modifiedArray.split(',')
       userArray.push(user.email)
-      db.collection('chats').add({
-        users: userArray,
-        chat_name: chat_name,
-      })
+      db.collection('chats')
+        .add({
+          users: userArray,
+          chat_name: chat_name,
+          type: 'group',
+        })
+        .then((docRef) => {
+          console.log('working')
+          userArray.forEach((user) => {
+            db.collection('users')
+              .where('email', '==', user)
+
+              .set({
+                nickname: '',
+                chat_id: docRef.id,
+              })
+          })
+        })
+        .catch((error) => console.error('Error adding document: ', error))
     }
   }
 
@@ -94,9 +109,11 @@ const sidebar = () => {
       </div>
 
       <div className={styles.search}>
-        <SearchIcon />
+        <div className="bg-gray-100 p-3">
+          <SearchIcon />
+        </div>
         <input
-          className="outline-none border-none flex-1"
+          className="outline-none border-none flex-1 bg-gray-100 p-3"
           placeholder="Search in chats"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
