@@ -1,6 +1,7 @@
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import 'firebase/compat/firestore'
+import { getStorage } from 'firebase/storage'
 
 // whatsapp-1759a.firebaseapp.com
 
@@ -23,4 +24,6 @@ const db = app.firestore()
 const auth = app.auth()
 const provider = new firebase.auth.GoogleAuthProvider()
 
-export { db, auth, provider }
+const storage = getStorage(app)
+
+export { db, auth, provider, storage }

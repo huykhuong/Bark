@@ -5,6 +5,7 @@ import ChatScreen from '../../components/ChatScreen'
 import { auth, db } from '../../firebase'
 import getRecipientEmail from '../../utils/getRecipientEmail'
 import Sidebar from '../../components/Sidebar'
+import { Toaster } from 'react-hot-toast'
 
 const ChatPage = ({ messages, chat }) => {
   const [user] = useAuthState(auth)
@@ -19,6 +20,7 @@ const ChatPage = ({ messages, chat }) => {
             : getRecipientEmail(chat.users, user)}
         </title>
       </Head>
+      <Toaster />
       <Sidebar />
       <div className="flex-1 overflow-scroll h-screen">
         <ChatScreen chat={chat} messages={messages} />

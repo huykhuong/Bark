@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
-import { auth, db } from '../firebase'
+import { auth, db, storage } from '../firebase'
 import { useRouter } from 'next/router'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
-import AttachFileIcon from '@material-ui/icons/AttachFile'
+import ImageIcon from '@material-ui/icons/Image'
 import { useCollection } from 'react-firebase-hooks/firestore'
 import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon'
 import MicIcon from '@material-ui/icons/Mic'
@@ -12,6 +12,7 @@ import { serverTimestamp } from 'firebase/firestore'
 import getRecipientEmail from '../utils/getRecipientEmail'
 import { Avatar } from '@material-ui/core'
 import TimeAgo from 'timeago-react'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import {
   isLastMessage,
   isSameSender,
@@ -20,12 +21,22 @@ import {
   renderNickname,
 } from '../utils/chatLogics'
 import dynamic from 'next/dynamic'
+import { v4 } from 'uuid'
+import toast from 'react-hot-toast'
 const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false })
+
+let firstTime = true
 
 const ChatScreen = ({ messages, chat }) => {
   const [user] = useAuthState(auth)
+
+  const imageUploadRef = useRef()
   const endOfMessageRef = useRef()
+
   const [input, setInput] = useState('')
+  const [image, setImage] = useState(null)
+  const [imageURL, setImageURL] = useState('')
+
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const router = useRouter()
   const [messagesSnapshot] = useCollection(
@@ -35,13 +46,27 @@ const ChatScreen = ({ messages, chat }) => {
       .collection('messages')
       .orderBy('timestamp', 'asc')
   )
-
   const nicknamesArray = chat.nicknames
-
   const bark_audio = new Audio('/bark_SFX.wav')
 
   const triggerBarkSound = () => {
     bark_audio.play()
+  }
+
+  // uploadImage function
+  const uploadImage = () => {
+    if (image === null) return
+    if (image.name === undefined) return
+    const refreshToast = toast.loading('Uploading...')
+    const imageRef = ref(storage, `images/${image.name + v4()}`)
+    uploadBytes(imageRef, image)
+      .then((uploadResult) => {})
+      .then(
+        () => getDownloadURL(imageRef).then((result) => setImageURL(result)),
+        toast.success('Photo uploaded!', {
+          id: refreshToast,
+        })
+      )
   }
 
   const scrollToBottom = () => {
@@ -55,8 +80,22 @@ const ChatScreen = ({ messages, chat }) => {
     scrollToBottom()
   }, [router.asPath])
 
+  //useEffect to upload the image
+  useEffect(() => {
+    uploadImage()
+  }, [image])
+
+  //useEffect to upload the image
+  useEffect(() => {
+    if (firstTime) {
+      firstTime = false
+      return
+    }
+    sendMessage(event, 'image')
+  }, [imageURL])
+
   //send message function
-  const sendMessage = (e) => {
+  const sendMessage = (e, type) => {
     e.preventDefault()
 
     db.collection('users').doc(user.uid).set(
@@ -66,12 +105,16 @@ const ChatScreen = ({ messages, chat }) => {
       { merge: true }
     )
 
-    db.collection('chats').doc(router.query.id).collection('messages').add({
-      timestamp: serverTimestamp(),
-      message: input,
-      user: user.email,
-      photoURL: user.photoURL,
-    })
+    db.collection('chats')
+      .doc(router.query.id)
+      .collection('messages')
+      .add({
+        timestamp: serverTimestamp(),
+        message: type === 'text' ? input : imageURL,
+        user: user.email,
+        photoURL: user.photoURL,
+        type: type,
+      })
     triggerBarkSound()
     setInput('')
     scrollToBottom()
@@ -172,7 +215,6 @@ const ChatScreen = ({ messages, chat }) => {
         </div>
         <div className="">
           <MoreVertIcon />
-          <AttachFileIcon />
         </div>
       </div>
 
@@ -191,8 +233,21 @@ const ChatScreen = ({ messages, chat }) => {
       )}
       <form className="flex items-center w-[calc(100vw-388.625px)] p-[10px] fixed bottom-0 bg-white z-100">
         <InsertEmoticonIcon
-          className="cursor-pointer"
+          className="cursor-pointer mr-3"
           onClick={() => setShowEmojiPicker((value) => !value)}
+        />
+        <ImageIcon
+          className="cursor-pointer"
+          onClick={() => imageUploadRef.current.click()}
+        />
+        <input
+          hidden
+          ref={imageUploadRef}
+          accept="image/*"
+          type="file"
+          onChange={(event) => {
+            setImage(event.target.files[0])
+          }}
         />
         <input
           className="flex-1 items-center p-[10px] sticky bg-white z-100 mx-[15px]"
@@ -200,7 +255,12 @@ const ChatScreen = ({ messages, chat }) => {
           placeholder="Bark here"
           onChange={(e) => setInput(e.target.value)}
         />
-        <button hidden disabled={!input} type="submit" onClick={sendMessage}>
+        <button
+          hidden
+          disabled={!input}
+          type="submit"
+          onClick={(e) => sendMessage(event, 'text')}
+        >
           Send message
         </button>
         <MicIcon />

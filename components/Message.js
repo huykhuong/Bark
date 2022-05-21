@@ -11,19 +11,33 @@ const Message = ({ user, message, chat_type }) => {
 
   const senderStyle = 'bg-[#dcf8c6]'
   const receiverStyle = 'text-left bg-blue-200'
+  const imageStyle = 'bg-transparent'
 
   return (
     <div>
-      <p
-        className={`${generalMessageStyle} ${
-          userLoggedIn.email === user ? senderStyle : receiverStyle
-        }`}
-      >
-        {message.message}
-        <span className="text-gray p-[10px] text-[9px] absolute bottom-0 text-right right-0">
-          {message.timestamp ? moment(message.timestamp).format('LT') : '...'}
-        </span>
-      </p>
+      {message.type === 'text' ? (
+        <p
+          className={`${generalMessageStyle} ${
+            userLoggedIn.email === user ? senderStyle : receiverStyle
+          }`}
+        >
+          {message.message}
+          <span className="text-gray p-[10px] text-[9px] absolute bottom-0 text-right right-0">
+            {message.timestamp ? moment(message.timestamp).format('LT') : '...'}
+          </span>
+        </p>
+      ) : (
+        <div
+          className={`${generalMessageStyle} ${
+            userLoggedIn.email === user ? imageStyle : receiverStyle
+          }`}
+        >
+          <img className="max-h-[400px] object-contain" src={message.message} />
+          <span className="text-gray p-[10px] text-[9px] absolute bottom-0 text-right right-0">
+            {message.timestamp ? moment(message.timestamp).format('LT') : '...'}
+          </span>
+        </div>
+      )}
     </div>
   )
 }
