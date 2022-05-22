@@ -3,10 +3,12 @@ import { useAuthState } from 'react-firebase-hooks/auth'
 import { auth, db, storage } from '../firebase'
 import { useRouter } from 'next/router'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
+import MenuIcon from '@material-ui/icons/Menu'
 import ImageIcon from '@material-ui/icons/Image'
 import { useCollection } from 'react-firebase-hooks/firestore'
 import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon'
 import MicIcon from '@material-ui/icons/Mic'
+import LabelIcon from '@material-ui/icons/Label'
 import Message from './Message'
 import { serverTimestamp } from 'firebase/firestore'
 import getRecipientEmail from '../utils/getRecipientEmail'
@@ -25,9 +27,10 @@ import { v4 } from 'uuid'
 import toast from 'react-hot-toast'
 const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false })
 
-let firstTime = true
+let firstTimeImage = true
+let firstTimeSticker = true
 
-const ChatScreen = ({ messages, chat }) => {
+const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
   const [user] = useAuthState(auth)
 
   const imageUploadRef = useRef()
@@ -36,6 +39,8 @@ const ChatScreen = ({ messages, chat }) => {
   const [input, setInput] = useState('')
   const [image, setImage] = useState(null)
   const [imageURL, setImageURL] = useState('')
+  const [openStickersArea, setOpenStickersArea] = useState(false)
+  const [sticker, setSticker] = useState('')
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const router = useRouter()
@@ -87,12 +92,21 @@ const ChatScreen = ({ messages, chat }) => {
 
   //useEffect to upload the image
   useEffect(() => {
-    if (firstTime) {
-      firstTime = false
+    if (firstTimeImage) {
+      firstTimeImage = false
       return
     }
     sendMessage(event, 'image')
   }, [imageURL])
+
+  //useEffect to upload the sticker
+  useEffect(() => {
+    if (firstTimeSticker) {
+      firstTimeSticker = false
+      return
+    }
+    sendMessage(event, 'sticker')
+  }, [sticker])
 
   //send message function
   const sendMessage = (e, type) => {
@@ -110,7 +124,8 @@ const ChatScreen = ({ messages, chat }) => {
       .collection('messages')
       .add({
         timestamp: serverTimestamp(),
-        message: type === 'text' ? input : imageURL,
+        message:
+          type === 'text' ? input : type === 'sticker' ? sticker : imageURL,
         user: user.email,
         photoURL: user.photoURL,
         type: type,
@@ -120,6 +135,7 @@ const ChatScreen = ({ messages, chat }) => {
     scrollToBottom()
   }
 
+  // recipient snapshot
   const [recipientSnapshot] = useCollection(
     db
       .collection('users')
@@ -187,32 +203,45 @@ const ChatScreen = ({ messages, chat }) => {
 
   return (
     <div className="scrollbar-hide">
-      <div className="sticky z-10 bg-gray-100 top-0 flex p-[11px] h-[80px] items-center border-b border-solid border-white">
-        {recipient && chat.users.length <= 2 ? (
-          <Avatar src={recipient?.photoURL} />
-        ) : !recipient && chat.users.length <= 2 ? (
-          <Avatar>{recipientEmail[0]}</Avatar>
-        ) : (
-          <img className="rounded-full w-10 h-10" src={chat.group_img_url} />
-          // <Avatar src={chat_img_url} />
-        )}
-        <div className="ml-[15px] flex-1">
-          <h3 className="font-bold text-lg">
-            {chat.chat_name ? chat.chat_name : recipientEmail}
-          </h3>
-          {recipientSnapshot ? (
-            <p>
-              Last active: {''}{' '}
-              {recipient?.lastSeen?.toDate() ? (
-                <TimeAgo datetime={recipient?.lastSeen?.toDate()} />
-              ) : (
-                'Unavailable'
-              )}
-            </p>
-          ) : (
-            <p>Loading last active</p>
-          )}
+      <div className="sticky z-10 bg-gray-100 top-0 flex px-[20px] lg:p-[11px] h-[80px] items-center border-b border-solid border-white lg:justify-start">
+        <div className="lg:hidden">
+          <MenuIcon
+            className="cursor-pointer"
+            onClick={() => {
+              setOpenSideBar(!openSideBar)
+            }}
+          />
         </div>
+
+        <div className="flex mx-auto lg:flex-1 lg:mx-0">
+          {recipient && chat.users.length <= 2 ? (
+            <Avatar src={recipient?.photoURL} />
+          ) : !recipient && chat.users.length <= 2 ? (
+            <Avatar>{recipientEmail[0]}</Avatar>
+          ) : (
+            <img className="rounded-full w-10 h-10" src={chat.group_img_url} />
+            // <Avatar src={chat_img_url} />
+          )}
+
+          <div className="ml-[15px] flex-1">
+            <h3 className="font-bold text-lg">
+              {chat.chat_name ? chat.chat_name : recipientEmail}
+            </h3>
+            {recipientSnapshot ? (
+              <p>
+                Last active: {''}{' '}
+                {recipient?.lastSeen?.toDate() ? (
+                  <TimeAgo datetime={recipient?.lastSeen?.toDate()} />
+                ) : (
+                  'Unavailable'
+                )}
+              </p>
+            ) : (
+              <p>Loading last active</p>
+            )}
+          </div>
+        </div>
+
         <div className="">
           <MoreVertIcon />
         </div>
@@ -231,40 +260,61 @@ const ChatScreen = ({ messages, chat }) => {
           onEmojiClick={emojiPick}
         />
       )}
-      <form className="flex items-center w-[calc(100vw-388.625px)] p-[10px] fixed bottom-0 bg-white z-100">
-        <InsertEmoticonIcon
-          className="cursor-pointer mr-3"
-          onClick={() => setShowEmojiPicker((value) => !value)}
-        />
-        <ImageIcon
-          className="cursor-pointer"
-          onClick={() => imageUploadRef.current.click()}
-        />
-        <input
-          hidden
-          ref={imageUploadRef}
-          accept="image/*"
-          type="file"
-          onChange={(event) => {
-            setImage(event.target.files[0])
-          }}
-        />
-        <input
-          className="flex-1 items-center p-[10px] sticky bg-white z-100 mx-[15px]"
-          value={input}
-          placeholder="Bark here"
-          onChange={(e) => setInput(e.target.value)}
-        />
-        <button
-          hidden
-          disabled={!input}
-          type="submit"
-          onClick={(e) => sendMessage(event, 'text')}
+
+      <div className="fixed bottom-0">
+        <div
+          className={`flex h-[100px] w-full bg-gray-100 ${
+            openStickersArea ? 'inline-flex' : 'hidden'
+          }`}
         >
-          Send message
-        </button>
-        <MicIcon />
-      </form>
+          {[...Array(9)].map((e, i) => (
+            <img
+              src={`/mimi${i + 1}.gif`}
+              className="max-w-[150px] cursor-pointer"
+              key={i}
+              onClick={() => setSticker(`mimi${i + 1}`)}
+            />
+          ))}
+        </div>
+        <form className="w-screen flex items-center p-[10px] bg-white z-100 lg:w-[calc(100vw-388.625px)]">
+          <InsertEmoticonIcon
+            className="cursor-pointer mr-3"
+            onClick={() => setShowEmojiPicker((value) => !value)}
+          />
+          <ImageIcon
+            className="cursor-pointer mr-3"
+            onClick={() => imageUploadRef.current.click()}
+          />
+          <input
+            hidden
+            ref={imageUploadRef}
+            accept="image/*"
+            type="file"
+            onChange={(event) => {
+              setImage(event.target.files[0])
+            }}
+          />
+          <LabelIcon
+            className="h-6 w-6 cursor-pointer"
+            onClick={() => setOpenStickersArea((prevValue) => !prevValue)}
+          />
+          <input
+            className="flex-1 items-center p-[10px] sticky bg-white z-100 mx-[15px]"
+            value={input}
+            placeholder="Bark here"
+            onChange={(e) => setInput(e.target.value)}
+          />
+          <button
+            hidden
+            disabled={!input}
+            type="submit"
+            onClick={(e) => sendMessage(event, 'text')}
+          >
+            Send message
+          </button>
+          <MicIcon />
+        </form>
+      </div>
     </div>
   )
 }

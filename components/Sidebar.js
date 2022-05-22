@@ -10,7 +10,7 @@ import Chat from './Chat'
 import { useState } from 'react'
 import getRecipientEmail from '../utils/getRecipientEmail'
 
-const sidebar = () => {
+const sidebar = ({ openSideBar }) => {
   const [user] = useAuthState(auth)
   const [searchInput, setSearchInput] = useState('')
   const chatRef = db
@@ -86,7 +86,7 @@ const sidebar = () => {
     )
 
   return (
-    <div className="max-h-screen overflow-scroll scrollbar-hide">
+    <div className="max-w-[320px] max-h-screen overflow-scroll scrollbar-hide lg:inline">
       <div className="flex items-center align-middle mb-[50px] p-5">
         <img className="h-[50px] w-[50px]" src="/bark.svg" />
         <h1 className={styles.brand}>Bark</h1>

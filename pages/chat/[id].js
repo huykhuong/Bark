@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import React from 'react'
+import React, { useState } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import ChatScreen from '../../components/ChatScreen'
 import { auth, db } from '../../firebase'
@@ -9,6 +9,7 @@ import { Toaster } from 'react-hot-toast'
 
 const ChatPage = ({ messages, chat }) => {
   const [user] = useAuthState(auth)
+  const [openSideBar, setOpenSideBar] = useState(false)
 
   return (
     <div className="flex">
@@ -21,9 +22,31 @@ const ChatPage = ({ messages, chat }) => {
         </title>
       </Head>
       <Toaster />
-      <Sidebar />
+
+      <div
+        className={`${
+          openSideBar
+            ? 'visible bg-opacity-70 bg-black'
+            : 'invisible bg-opacity-0 bg-black'
+        } bg-black bg-opacity-60 w-full h-full fixed top-0 bottom-0 left-0 z-20 transition-all duration-[600ms] ease-[0.85, 0.01, 0.4, 1]`}
+        onClick={() => setOpenSideBar(false)}
+      ></div>
+
+      <div
+        className={`absolute left-0 top-0 bottom-0 z-30 bg-white ${
+          openSideBar ? 'ml-0' : '-ml-[320px]'
+        } transition-all duration-[600ms] ease-[0.85, 0.01, 0.4, 1] lg:relative lg:ml-0`}
+      >
+        <Sidebar openSideBar={openSideBar} />
+      </div>
+
       <div className="flex-1 overflow-scroll h-screen">
-        <ChatScreen chat={chat} messages={messages} />
+        <ChatScreen
+          chat={chat}
+          messages={messages}
+          openSideBar={openSideBar}
+          setOpenSideBar={setOpenSideBar}
+        />
       </div>
     </div>
   )

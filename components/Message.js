@@ -2,6 +2,7 @@ import moment from 'moment'
 import React from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { auth } from '../firebase'
+import { getGifImage } from '../utils/getGifImage'
 
 const Message = ({ user, message, chat_type }) => {
   const [userLoggedIn] = useAuthState(auth)
@@ -26,10 +27,24 @@ const Message = ({ user, message, chat_type }) => {
             {message.timestamp ? moment(message.timestamp).format('LT') : '...'}
           </span>
         </p>
-      ) : (
+      ) : message.type === 'sticker' ? (
         <div
           className={`${generalMessageStyle} ${
             userLoggedIn.email === user ? imageStyle : receiverStyle
+          }`}
+        >
+          <img
+            src={getGifImage(message.message)}
+            className="max-h-[150px] object-contain"
+          />
+          <span className="text-gray p-[10px] text-[9px] absolute bottom-0 text-right right-0">
+            {message.timestamp ? moment(message.timestamp).format('LT') : '...'}
+          </span>
+        </div>
+      ) : (
+        <div
+          className={`${generalMessageStyle} p-0 ${
+            userLoggedIn.email === user ? imageStyle : `${imageStyle} text-left`
           }`}
         >
           <img className="max-h-[400px] object-contain" src={message.message} />
