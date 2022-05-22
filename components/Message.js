@@ -13,6 +13,7 @@ const Message = ({ user, message, chat_type }) => {
   const senderStyle = 'bg-[#dcf8c6]'
   const receiverStyle = 'text-left bg-blue-200'
   const imageStyle = 'bg-transparent'
+  const receiverStickerStyle = 'text-left'
 
   return (
     <div>
@@ -24,13 +25,13 @@ const Message = ({ user, message, chat_type }) => {
         >
           {message.message}
           <span className="text-gray p-[10px] text-[9px] absolute bottom-0 text-right right-0">
-            {message.timestamp ? moment(message.timestamp).format('LT') : '...'}
+            {message.timestamp ? moment(message.timestamp).calendar() : '...'}
           </span>
         </p>
       ) : message.type === 'sticker' ? (
         <div
           className={`${generalMessageStyle} ${
-            userLoggedIn.email === user ? imageStyle : receiverStyle
+            userLoggedIn.email === user ? imageStyle : receiverStickerStyle
           }`}
         >
           <img
@@ -38,7 +39,7 @@ const Message = ({ user, message, chat_type }) => {
             className="max-h-[150px] object-contain"
           />
           <span className="text-gray p-[10px] text-[9px] absolute bottom-0 text-right right-0">
-            {message.timestamp ? moment(message.timestamp).format('LT') : '...'}
+            {message.timestamp ? moment(message.timestamp).calendar() : '...'}
           </span>
         </div>
       ) : (
@@ -49,7 +50,7 @@ const Message = ({ user, message, chat_type }) => {
         >
           <img className="max-h-[400px] object-contain" src={message.message} />
           <span className="text-gray p-[10px] text-[9px] absolute bottom-0 text-right right-0">
-            {message.timestamp ? moment(message.timestamp).format('LT') : '...'}
+            {message.timestamp ? moment(message.timestamp).calendar() : '...'}
           </span>
         </div>
       )}

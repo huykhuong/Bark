@@ -28,7 +28,7 @@ const ChatPage = ({ messages, chat }) => {
           openSideBar
             ? 'visible bg-opacity-70 bg-black'
             : 'invisible bg-opacity-0 bg-black'
-        } bg-black bg-opacity-60 w-full h-full fixed top-0 bottom-0 left-0 z-20 transition-all duration-[600ms] ease-[0.85, 0.01, 0.4, 1]`}
+        }  w-full h-full fixed top-0 bottom-0 left-0 z-20 transition-all duration-[600ms] ease-[0.85, 0.01, 0.4, 1]`}
         onClick={() => setOpenSideBar(false)}
       ></div>
 

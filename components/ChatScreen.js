@@ -25,6 +25,7 @@ import {
 import dynamic from 'next/dynamic'
 import { v4 } from 'uuid'
 import toast from 'react-hot-toast'
+import ChatProfileModal from './ChatProfileModal'
 const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false })
 
 let firstTimeImage = true
@@ -41,6 +42,7 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
   const [imageURL, setImageURL] = useState('')
   const [openStickersArea, setOpenStickersArea] = useState(false)
   const [sticker, setSticker] = useState('')
+  const [openProfileModal, setOpenProfileModal] = useState(false)
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const router = useRouter()
@@ -202,7 +204,15 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
   const recipientEmail = getRecipientEmail(chat.users, user)
 
   return (
-    <div className="scrollbar-hide">
+    <div className="scrollbar-hide relative">
+      <div
+        className={`${
+          openProfileModal ? 'inline' : 'hidden'
+        } fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30`}
+      >
+        <ChatProfileModal />
+      </div>
+
       <div className="sticky z-10 bg-gray-100 top-0 flex px-[20px] lg:p-[11px] h-[80px] items-center border-b border-solid border-white lg:justify-start">
         <div className="lg:hidden">
           <MenuIcon
@@ -242,7 +252,10 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
           </div>
         </div>
 
-        <div className="">
+        <div
+          className=""
+          onClick={() => setOpenProfileModal((prevValue) => !prevValue)}
+        >
           <MoreVertIcon />
         </div>
       </div>
@@ -261,21 +274,22 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
         />
       )}
 
+      <div
+        className={`flex h-[100px] bg-gray-100 w-full overflow-x-auto fixed bottom-[64px] ${
+          openStickersArea ? 'inline-flex' : 'hidden'
+        }`}
+      >
+        {[...Array(9)].map((e, i) => (
+          <img
+            src={`/mimi${i + 1}.gif`}
+            className="max-w-[150px] cursor-pointer"
+            key={i}
+            onClick={() => setSticker(`mimi${i + 1}`)}
+          />
+        ))}
+      </div>
+
       <div className="fixed bottom-0">
-        <div
-          className={`flex h-[100px] w-full bg-gray-100 ${
-            openStickersArea ? 'inline-flex' : 'hidden'
-          }`}
-        >
-          {[...Array(9)].map((e, i) => (
-            <img
-              src={`/mimi${i + 1}.gif`}
-              className="max-w-[150px] cursor-pointer"
-              key={i}
-              onClick={() => setSticker(`mimi${i + 1}`)}
-            />
-          ))}
-        </div>
         <form className="w-screen flex items-center p-[10px] bg-white z-100 lg:w-[calc(100vw-388.625px)]">
           <InsertEmoticonIcon
             className="cursor-pointer mr-3"
