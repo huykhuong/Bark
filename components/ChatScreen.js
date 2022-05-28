@@ -204,13 +204,17 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
   const recipientEmail = getRecipientEmail(chat.users, user)
 
   return (
-    <div className="scrollbar-hide relative">
+    <div className="relative">
       <div
         className={`${
           openProfileModal ? 'inline' : 'hidden'
         } fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30`}
       >
-        <ChatProfileModal />
+        <ChatProfileModal
+          openProfileModal={openProfileModal}
+          setOpenProfileModal={setOpenProfileModal}
+          nickname={renderNickname(nicknamesArray, user.email)}
+        />
       </div>
 
       <div className="sticky z-10 bg-gray-100 top-0 flex px-[20px] lg:p-[11px] h-[80px] items-center border-b border-solid border-white lg:justify-start">
@@ -263,7 +267,7 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
       <div className="p-[30px] ">
         {showMessages()}
         {/* End of message */}
-        <div className="mb-[50px]" ref={endOfMessageRef}></div>
+        <div className="mb-[130px]" ref={endOfMessageRef}></div>
       </div>
 
       {/* Send message box */}

@@ -40,7 +40,7 @@ const ChatPage = ({ messages, chat }) => {
         <Sidebar openSideBar={openSideBar} />
       </div>
 
-      <div className="flex-1 overflow-scroll h-screen">
+      <div className="flex-1 overflow-scroll scrollbar-hide h-screen">
         <ChatScreen
           chat={chat}
           messages={messages}
