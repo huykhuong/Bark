@@ -1,13 +1,9 @@
 import Head from 'next/head'
 import React from 'react'
 import { auth, provider } from '../firebase'
-import { useRouter } from 'next/router'
 
 const Login = () => {
-  const router = useRouter()
-
   const signIn = () => {
-    router.replace('/')
     auth.signInWithPopup(provider).catch(alert)
   }
   return (

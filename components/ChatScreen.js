@@ -28,10 +28,10 @@ import toast from 'react-hot-toast'
 import ChatProfileModal from './ChatProfileModal'
 const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false })
 
-let firstTimeImage = true
-let firstTimeSticker = true
-
 const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
+  let firstTimeImage = true
+  let firstTimeSticker = true
+
   const [user] = useAuthState(auth)
 
   const imageUploadRef = useRef()
@@ -214,6 +214,8 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
           openProfileModal={openProfileModal}
           setOpenProfileModal={setOpenProfileModal}
           nickname={renderNickname(nicknamesArray, user.email)}
+          userEmail={user.email}
+          chat={chat}
         />
       </div>
 
