@@ -29,8 +29,8 @@ import ChatProfileModal from './ChatProfileModal'
 const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false })
 
 const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
-  let firstTimeImage = true
-  let firstTimeSticker = true
+  const [firstTimeImage, setFirstTimeImage] = useState(true)
+  const [firstTimeSticker, setFirstTimeSticker] = useState(true)
 
   const [user] = useAuthState(auth)
 
@@ -53,6 +53,10 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
       .collection('messages')
       .orderBy('timestamp', 'asc')
   )
+  // const [chatSnapshot] = useCollection(
+  //   db.collection('chats').doc(router.query.id)
+  // )
+
   const nicknamesArray = chat.nicknames
   const bark_audio = new Audio('/bark_SFX.wav')
 
@@ -63,7 +67,7 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
   // uploadImage function
   const uploadImage = () => {
     if (image === null) return
-    if (image.name === undefined) return
+    if (!image.name === undefined) return
     const refreshToast = toast.loading('Uploading...')
     const imageRef = ref(storage, `images/${image.name + v4()}`)
     uploadBytes(imageRef, image)
@@ -83,32 +87,32 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
     })
   }
 
-  useEffect(() => {
-    scrollToBottom()
-  }, [router.asPath])
+  // useEffect(() => {
+  //   scrollToBottom()
+  // }, [router.asPath])
 
-  //useEffect to upload the image
-  useEffect(() => {
-    uploadImage()
-  }, [image])
+  // //useEffect to upload the image
+  // useEffect(() => {
+  //   uploadImage()
+  // }, [image])
 
-  //useEffect to upload the image
-  useEffect(() => {
-    if (firstTimeImage) {
-      firstTimeImage = false
-      return
-    }
-    sendMessage(event, 'image')
-  }, [imageURL])
+  // //useEffect to upload the image
+  // useEffect(() => {
+  //   if (firstTimeImage) {
+  //     setFirstTimeImage(false)
+  //     return
+  //   }
+  //   sendMessage(event, 'image')
+  // }, [imageURL])
 
-  //useEffect to upload the sticker
-  useEffect(() => {
-    if (firstTimeSticker) {
-      firstTimeSticker = false
-      return
-    }
-    sendMessage(event, 'sticker')
-  }, [sticker])
+  // //useEffect to upload the sticker
+  // useEffect(() => {
+  //   if (firstTimeSticker) {
+  //     setFirstTimeSticker(false)
+  //     return
+  //   }
+  //   sendMessage(event, 'sticker')
+  // }, [sticker])
 
   //send message function
   const sendMessage = (e, type) => {
@@ -219,7 +223,7 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
         />
       </div>
 
-      <div className="sticky z-10 bg-gray-100 top-0 flex px-[20px] lg:p-[11px] h-[80px] items-center border-b border-solid border-white lg:justify-start">
+      <div className="bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400 sticky z-10 bg-gray-100 top-0 flex px-[20px] lg:p-[11px] h-[80px] items-center lg:justify-start">
         <div className="lg:hidden">
           <MenuIcon
             className="cursor-pointer"
@@ -295,8 +299,12 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
         ))}
       </div>
 
-      <div className="fixed bottom-0">
-        <form className="w-screen flex items-center p-[10px] bg-white z-100 lg:w-[calc(100vw-388.625px)]">
+      <div
+        className={`fixed bottom-0 ${
+          chatSnapshot ? chatSnapshot.docs[0].data().theme : 'bg-white'
+        }`}
+      >
+        <form className=" w-screen flex items-center p-[10px] z-100 lg:w-[calc(100vw-388.625px)]">
           <InsertEmoticonIcon
             className="cursor-pointer mr-3"
             onClick={() => setShowEmojiPicker((value) => !value)}

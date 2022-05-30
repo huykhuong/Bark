@@ -11,12 +11,16 @@ const ChatProfileModal = ({
   const [input, setInput] = useState('')
   const inputRef = useRef(null)
 
-  // const nicknameRef = db
-  //   .collection('chats')
-  //   .where('nicknames', 'array-contains', {
-  //     nickname: nickname === userEmail ? '' : nickname,
-  //     user: userEmail,
-  //   })
+  const gradientThemes = [
+    'bg-gradient-to-br from-green-300 via-blue-500 to-purple-600',
+    'bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400',
+    'bg-gradient-to-br from-red-200 via-red-300 to-yellow-200',
+    'bg-gradient-to-br from-indigo-200 via-red-200 to-yellow-100',
+    'bg-gradient-to-br from-indigo-300 to-purple-400',
+    'bg-gradient-to-br from-cyan-200 to-cyan-400',
+    'bg-gradient-to-br from-orange-400 to-rose-400',
+    'bg-gradient-to-r from-rose-400 via-fuchsia-500 to-indigo-500',
+  ]
 
   // update function
   const editNickname = (e) => {
@@ -58,6 +62,7 @@ const ChatProfileModal = ({
           <span className="font-bold">{nickname}</span>
         </h2>
 
+        {/* Change nickname form */}
         <form
           className="flex items-center justify-center"
           onSubmit={editNickname}
@@ -87,6 +92,16 @@ const ChatProfileModal = ({
             </svg>
           </button>
         </form>
+
+        {/* Change color theme area */}
+        <div className="mt-5 mx-auto w-[90%] h-auto">
+          <h2 className="w-fit mb-6 font-medium">Gradient Theme</h2>
+          <div className="flex flex-wrap gap-x-5 gap-y-3">
+            {gradientThemes.map((theme) => (
+              <div className={`${theme} h-12 w-12 rounded-full`}></div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )
