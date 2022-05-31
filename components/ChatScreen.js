@@ -10,7 +10,7 @@ import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon'
 import MicIcon from '@material-ui/icons/Mic'
 import LabelIcon from '@material-ui/icons/Label'
 import Message from './Message'
-import { serverTimestamp } from 'firebase/firestore'
+import { documentId, FieldPath, serverTimestamp } from 'firebase/firestore'
 import getRecipientEmail from '../utils/getRecipientEmail'
 import { Avatar } from '@material-ui/core'
 import TimeAgo from 'timeago-react'
@@ -53,9 +53,12 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
       .collection('messages')
       .orderBy('timestamp', 'asc')
   )
-  // const [chatSnapshot] = useCollection(
-  //   db.collection('chats').doc(router.query.id)
-  // )
+
+  //Chat snapshot to oversee the change in theme color
+  const chatRef = db
+    .collection('chats')
+    .where(documentId(), '==', router.query.id)
+  const [chatsSnapshot] = useCollection(chatRef)
 
   const nicknamesArray = chat.nicknames
   const bark_audio = new Audio('/bark_SFX.wav')
@@ -223,7 +226,11 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
         />
       </div>
 
-      <div className="bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400 sticky z-10 bg-gray-100 top-0 flex px-[20px] lg:p-[11px] h-[80px] items-center lg:justify-start">
+      <div
+        className={`${
+          chatsSnapshot ? chatsSnapshot?.docs?.[0]?.data().theme : 'bg-gray-100'
+        } sticky z-10 0 top-0 flex px-[20px] h-[80px] items-center lg:p-[11px] lg:justify-start`}
+      >
         <div className="lg:hidden">
           <MenuIcon
             className="cursor-pointer"
@@ -301,8 +308,8 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
 
       <div
         className={`fixed bottom-0 ${
-          chatSnapshot ? chatSnapshot.docs[0].data().theme : 'bg-white'
-        }`}
+          chatsSnapshot ? chatsSnapshot?.docs?.[0]?.data().theme : 'bg-white'
+        } `}
       >
         <form className=" w-screen flex items-center p-[10px] z-100 lg:w-[calc(100vw-388.625px)]">
           <InsertEmoticonIcon

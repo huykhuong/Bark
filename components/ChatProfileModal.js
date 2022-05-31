@@ -44,7 +44,7 @@ const ChatProfileModal = ({
       { merge: true }
     )
 
-    inputRef.current.value = ''
+    setInput('')
   }
 
   return (
@@ -97,8 +97,11 @@ const ChatProfileModal = ({
         <div className="mt-5 mx-auto w-[90%] h-auto">
           <h2 className="w-fit mb-6 font-medium">Gradient Theme</h2>
           <div className="flex flex-wrap gap-x-5 gap-y-3">
-            {gradientThemes.map((theme) => (
-              <div className={`${theme} h-12 w-12 rounded-full`}></div>
+            {gradientThemes.map((theme, index) => (
+              <div
+                key={index}
+                className={`${theme} h-12 w-12 rounded-full`}
+              ></div>
             ))}
           </div>
         </div>
