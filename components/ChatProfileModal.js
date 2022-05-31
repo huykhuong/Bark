@@ -22,6 +22,9 @@ const ChatProfileModal = ({
     'bg-gradient-to-r from-rose-400 via-fuchsia-500 to-indigo-500',
   ]
 
+  // change theme function
+  const changeTheme = (theme) => {}
+
   // update function
   const editNickname = (e) => {
     e.preventDefault()
@@ -99,6 +102,7 @@ const ChatProfileModal = ({
           <div className="flex flex-wrap gap-x-5 gap-y-3">
             {gradientThemes.map((theme, index) => (
               <div
+                onClick={() => changeTheme(theme)}
                 key={index}
                 className={`${theme} h-12 w-12 rounded-full`}
               ></div>
