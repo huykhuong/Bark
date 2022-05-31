@@ -186,7 +186,9 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
                 </p>
               )}
             <Message
+              key={message.id}
               user={message.data().user}
+              chat_theme={chatsSnapshot?.docs?.[0]?.data().theme}
               message={{
                 ...message.data(),
                 timestamp: message.data().timestamp?.toDate().getTime(),
@@ -211,7 +213,13 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
   const recipientEmail = getRecipientEmail(chat.users, user)
 
   return (
-    <div className="relative">
+    <div
+      style={{
+        backgroundImage: `url(/coachella.png)`,
+        backgroundSize: '100% 100%',
+      }}
+      className="relative overflow-scroll scrollbar-hide h-screen bg-no-repeat bg-center bg-cover"
+    >
       <div
         className={`${
           openProfileModal ? 'inline' : 'hidden'

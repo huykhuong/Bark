@@ -4,13 +4,13 @@ import { useAuthState } from 'react-firebase-hooks/auth'
 import { auth } from '../firebase'
 import { getGifImage } from '../utils/getGifImage'
 
-const Message = ({ user, message, chat_type }) => {
+const Message = ({ user, message, chat_theme }) => {
   const [userLoggedIn] = useAuthState(auth)
 
   const generalMessageStyle =
     'w-fit p-[15px] rounded-[8px] mt-[10px] ml-[10px] min-w-[60px] pb-[26px] relative'
 
-  const senderStyle = 'bg-[#dcf8c6]'
+  const senderStyle = `${chat_theme} absolute bottom-0`
   const receiverStyle = 'text-left bg-blue-200'
   const imageStyle = 'bg-transparent'
   const receiverStickerStyle = 'text-left'
@@ -21,7 +21,7 @@ const Message = ({ user, message, chat_type }) => {
         <p
           className={`${generalMessageStyle} ${
             userLoggedIn.email === user ? senderStyle : receiverStyle
-          }`}
+          } `}
         >
           {message.message}
           <span className="text-gray p-[10px] text-[9px] absolute bottom-0 text-right right-0">

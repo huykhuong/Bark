@@ -1,3 +1,5 @@
+import { doc, updateDoc } from 'firebase/firestore'
+import { useRouter } from 'next/router'
 import React, { useRef, useState } from 'react'
 import { db } from '../firebase'
 
@@ -10,6 +12,7 @@ const ChatProfileModal = ({
 }) => {
   const [input, setInput] = useState('')
   const inputRef = useRef(null)
+  const router = useRouter()
 
   const gradientThemes = [
     'bg-gradient-to-br from-green-300 via-blue-500 to-purple-600',
@@ -22,8 +25,15 @@ const ChatProfileModal = ({
     'bg-gradient-to-r from-rose-400 via-fuchsia-500 to-indigo-500',
   ]
 
+  const solidTheme = ['bg-white', 'bg-gray-300', 'bg-blue-500', 'bg-red-500']
+
   // change theme function
-  const changeTheme = (theme) => {}
+  const changeTheme = (theme) => {
+    const docRef = doc(db, 'chats', router.query.id)
+    updateDoc(docRef, {
+      theme: theme,
+    })
+  }
 
   // update function
   const editNickname = (e) => {
@@ -59,7 +69,7 @@ const ChatProfileModal = ({
       ></div>
 
       {/* modal box */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[50vh] p-5 bg-white rounded-md text-center">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[50vh] p-5 bg-white rounded-md text-center overflow-y-auto">
         <h2>
           Your fucking nickname in this group is{' '}
           <span className="font-bold">{nickname}</span>
@@ -72,6 +82,7 @@ const ChatProfileModal = ({
         >
           <input
             ref={inputRef}
+            placeholder="Change your nickname"
             className="mt-5 bg-gray-100 p-4"
             onChange={(e) => {
               setInput(e.target.value)
@@ -97,7 +108,7 @@ const ChatProfileModal = ({
         </form>
 
         {/* Change color theme area */}
-        <div className="mt-5 mx-auto w-[90%] h-auto">
+        <div className="mt-16 mx-auto w-[90%] h-auto">
           <h2 className="w-fit mb-6 font-medium">Gradient Theme</h2>
           <div className="flex flex-wrap gap-x-5 gap-y-3">
             {gradientThemes.map((theme, index) => (
@@ -105,6 +116,17 @@ const ChatProfileModal = ({
                 onClick={() => changeTheme(theme)}
                 key={index}
                 className={`${theme} h-12 w-12 rounded-full`}
+              ></div>
+            ))}
+          </div>
+
+          <h2 className="w-fit mt-10 mb-6 font-medium">Solid Theme</h2>
+          <div className="flex flex-wrap gap-x-5 gap-y-3">
+            {solidTheme.map((theme, index) => (
+              <div
+                onClick={() => changeTheme(theme)}
+                key={index}
+                className={`${theme} h-12 w-12 rounded-full border-2`}
               ></div>
             ))}
           </div>
