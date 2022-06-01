@@ -239,7 +239,7 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
       <div
         className={`${
           chatsSnapshot ? chatsSnapshot?.docs?.[0]?.data().theme : 'bg-gray-100'
-        } sticky z-10 0 top-0 flex px-[20px] h-[80px] items-center lg:p-[11px] lg:justify-start`}
+        } fixed w-full z-10 0 top-0 flex px-[20px] h-[80px] items-center lg:p-[11px] lg:justify-start`}
       >
         <div className="lg:hidden">
           <MenuIcon

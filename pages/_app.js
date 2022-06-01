@@ -5,6 +5,7 @@ import Login from './login'
 import Loading from '../components/Loading'
 import { useEffect } from 'react'
 import { serverTimestamp } from 'firebase/firestore'
+import { Head } from 'next/head'
 
 function MyApp({ Component, pageProps }) {
   const [user, loading] = useAuthState(auth)
@@ -24,7 +25,16 @@ function MyApp({ Component, pageProps }) {
 
   if (loading) return <Loading />
   if (!user) return <Login />
-  return <Component {...pageProps} />
+
+  return (
+    <>
+      <Head>
+        <link rel="manifest" href="/manifest.json" />
+      </Head>
+
+      <Component {...pageProps} />
+    </>
+  )
 }
 
 export default MyApp

@@ -10,7 +10,7 @@ export const renderThemeBackground = (color) => {
         return 'coachella.png'
       case 'bg-gradient-to-br from-indigo-200 via-red-200 to-yellow-100':
         return 'idk.jpg'
-      case 'bg-gradient-to-tr from-blue-400 to-emerald-400':
+      case 'bg-gradient-to-tr from-sky-400 to-sky-200':
         return 'dusk.jpg'
       case 'bg-gradient-to-r from-rose-400 via-fuchsia-500 to-indigo-500':
         return 'moon-pink-aesthetic-jyhfvylz3rmavkmb.jpg'
@@ -18,6 +18,10 @@ export const renderThemeBackground = (color) => {
         return 'chill_dark.jpg'
       case 'bg-gradient-to-bl from-fuchsia-600 to-pink-600':
         return 'racing.jpg'
+      case 'bg-gradient-to-tr from-blue-400 to-emerald-400':
+        return 'gradient_number_6.jpg'
+      case 'bg-gradient-to-br from-orange-400 to-rose-400':
+        return 'gradient_number_7.jpg'
       default:
         break
     }
