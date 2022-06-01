@@ -19,10 +19,11 @@ const ChatProfileModal = ({
     'bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400',
     'bg-gradient-to-br from-red-200 via-red-300 to-yellow-200',
     'bg-gradient-to-br from-indigo-200 via-red-200 to-yellow-100',
-    'bg-gradient-to-br from-indigo-300 to-purple-400',
-    'bg-gradient-to-br from-cyan-200 to-cyan-400',
+    'bg-gradient-to-br from-teal-200 to-lime-200',
+    'bg-gradient-to-tr from-blue-400 to-emerald-400',
     'bg-gradient-to-br from-orange-400 to-rose-400',
     'bg-gradient-to-r from-rose-400 via-fuchsia-500 to-indigo-500',
+    'bg-gradient-to-bl from-fuchsia-600 to-pink-600',
   ]
 
   const solidTheme = ['bg-white', 'bg-gray-300', 'bg-blue-500', 'bg-red-500']

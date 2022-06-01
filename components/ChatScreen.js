@@ -26,6 +26,7 @@ import dynamic from 'next/dynamic'
 import { v4 } from 'uuid'
 import toast from 'react-hot-toast'
 import ChatProfileModal from './ChatProfileModal'
+import { renderThemeBackground } from '../utils/renderThemeBackground'
 const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false })
 
 const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
@@ -215,8 +216,9 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
   return (
     <div
       style={{
-        backgroundImage: `url(/coachella.png)`,
-        backgroundSize: '100% 100%',
+        backgroundImage: `url(/${renderThemeBackground(
+          chatsSnapshot?.docs?.[0]?.data().theme
+        )})`,
       }}
       className="relative overflow-scroll scrollbar-hide h-screen bg-no-repeat bg-center bg-cover"
     >
