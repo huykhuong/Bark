@@ -25,7 +25,7 @@ const Message = ({ user, message, chat_theme }) => {
         >
           {message.message}
           <span className="text-gray opacity-70 p-[10px] text-[9px] absolute bottom-0 text-right right-0">
-            {message.timestamp ? moment(message.timestamp).calendar() : '...'}
+            {message.timestamp ? moment(message.timestamp).calendar() : ''}
           </span>
         </p>
       ) : message.type === 'sticker' ? (
@@ -39,7 +39,7 @@ const Message = ({ user, message, chat_theme }) => {
             className="max-h-[150px] object-contain"
           />
           <span className="text-gray p-[10px] text-[9px] absolute bottom-0 text-right right-0">
-            {message.timestamp ? moment(message.timestamp).calendar() : '...'}
+            {message.timestamp ? moment(message.timestamp).calendar() : ''}
           </span>
         </div>
       ) : (
@@ -50,7 +50,7 @@ const Message = ({ user, message, chat_theme }) => {
         >
           <img className="max-h-[400px] object-contain" src={message.message} />
           <span className="text-gray p-[10px] text-[9px] absolute bottom-0 text-right right-0">
-            {message.timestamp ? moment(message.timestamp).calendar() : '...'}
+            {message.timestamp ? moment(message.timestamp).calendar() : ''}
           </span>
         </div>
       )}

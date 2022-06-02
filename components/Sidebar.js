@@ -17,6 +17,13 @@ const sidebar = ({ openSideBar }) => {
     .collection('chats')
     .where('users', 'array-contains', user?.email)
   const [chatsSnapshot] = useCollection(chatRef)
+  const [messagesSnapshot] = useCollection(
+    db
+      .collection('chats')
+      .doc('UzzS9JiwT9yi30Je2jNr')
+      .collection('messages')
+      .orderBy('timestamp', 'desc')
+  )
 
   const styles = {
     brand: 'text-2xl p-[15px]',
@@ -153,6 +160,7 @@ const sidebar = ({ openSideBar }) => {
               chat_img_url={
                 chat.data().type === 'group' ? chat.data().group_img_url : ''
               }
+              last_message={messagesSnapshot?.docs?.[0]?.data().message}
             />
           )
         })}

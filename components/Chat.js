@@ -6,7 +6,7 @@ import { useAuthState } from 'react-firebase-hooks/auth'
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { useRouter } from 'next/router'
 
-function Chat({ id, users, chat_name, chat_img_url }) {
+function Chat({ id, users, chat_name, chat_img_url, last_message }) {
   const [user] = useAuthState(auth)
   const router = useRouter()
 
@@ -35,7 +35,10 @@ function Chat({ id, users, chat_name, chat_img_url }) {
         <img className="rounded-full w-10 h-10" src={chat_img_url} />
         // <Avatar src={chat_img_url} />
       )}
-      {chat_name !== '' ? <p>{chat_name}</p> : <p>{recipientEmail}</p>}
+      <div className="flex flex-col">
+        {chat_name !== '' ? <p>{chat_name}</p> : <p>{recipientEmail}</p>}
+        <p className="font-bold">{last_message}</p>
+      </div>
     </div>
   )
 }
