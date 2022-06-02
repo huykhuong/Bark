@@ -92,32 +92,32 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
     })
   }
 
-  useEffect(() => {
-    scrollToBottom()
-  }, [router.asPath])
+  // useEffect(() => {
+  //   scrollToBottom()
+  // }, [router.asPath])
 
-  //useEffect to upload the image
-  useEffect(() => {
-    uploadImage()
-  }, [image])
+  // //useEffect to upload the image
+  // useEffect(() => {
+  //   uploadImage()
+  // }, [image])
 
-  //useEffect to upload the image
-  useEffect(() => {
-    if (firstTimeImage) {
-      setFirstTimeImage(false)
-      return
-    }
-    sendMessage(event, 'image')
-  }, [imageURL])
+  // //useEffect to upload the image
+  // useEffect(() => {
+  //   if (firstTimeImage) {
+  //     setFirstTimeImage(false)
+  //     return
+  //   }
+  //   sendMessage(event, 'image')
+  // }, [imageURL])
 
-  //useEffect to upload the sticker
-  useEffect(() => {
-    if (firstTimeSticker) {
-      setFirstTimeSticker(false)
-      return
-    }
-    sendMessage(event, 'sticker')
-  }, [sticker])
+  // //useEffect to upload the sticker
+  // useEffect(() => {
+  //   if (firstTimeSticker) {
+  //     setFirstTimeSticker(false)
+  //     return
+  //   }
+  //   sendMessage(event, 'sticker')
+  // }, [sticker])
 
   //send message function
   const sendMessage = (e, type) => {
@@ -291,7 +291,7 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
       <div className="p-[30px] overflow-scroll scrollbar-hide h-screen">
         {showMessages()}
         {/* End of message */}
-        <div className="mb-[100px] mt-[150px]" ref={endOfMessageRef}></div>
+        <div className="mt-[90px]" ref={endOfMessageRef}></div>
       </div>
 
       {/* Send message box */}
