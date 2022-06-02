@@ -220,7 +220,7 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
           chatsSnapshot?.docs?.[0]?.data().theme
         )})`,
       }}
-      className="relative overflow-scroll scrollbar-hide h-screen bg-no-repeat bg-center bg-cover"
+      className="relative overflow-hidden scrollbar-hide h-screen bg-no-repeat bg-center bg-cover"
     >
       <div
         className={`${
@@ -287,7 +287,7 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
         </div>
       </div>
 
-      <div className="p-[30px] ">
+      <div className="p-[30px] overflow-scroll scrollbar-hide h-screen">
         {showMessages()}
         {/* End of message */}
         <div className="mb-[130px]" ref={endOfMessageRef}></div>
