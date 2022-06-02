@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 import MenuIcon from '@material-ui/icons/Menu'
 import ImageIcon from '@material-ui/icons/Image'
+import SendIcon from '@material-ui/icons/Send'
 import { useCollection } from 'react-firebase-hooks/firestore'
 import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon'
 import MicIcon from '@material-ui/icons/Mic'
@@ -91,32 +92,32 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
     })
   }
 
-  // useEffect(() => {
-  //   scrollToBottom()
-  // }, [router.asPath])
+  useEffect(() => {
+    scrollToBottom()
+  }, [router.asPath])
 
-  // //useEffect to upload the image
-  // useEffect(() => {
-  //   uploadImage()
-  // }, [image])
+  //useEffect to upload the image
+  useEffect(() => {
+    uploadImage()
+  }, [image])
 
-  // //useEffect to upload the image
-  // useEffect(() => {
-  //   if (firstTimeImage) {
-  //     setFirstTimeImage(false)
-  //     return
-  //   }
-  //   sendMessage(event, 'image')
-  // }, [imageURL])
+  //useEffect to upload the image
+  useEffect(() => {
+    if (firstTimeImage) {
+      setFirstTimeImage(false)
+      return
+    }
+    sendMessage(event, 'image')
+  }, [imageURL])
 
-  // //useEffect to upload the sticker
-  // useEffect(() => {
-  //   if (firstTimeSticker) {
-  //     setFirstTimeSticker(false)
-  //     return
-  //   }
-  //   sendMessage(event, 'sticker')
-  // }, [sticker])
+  //useEffect to upload the sticker
+  useEffect(() => {
+    if (firstTimeSticker) {
+      setFirstTimeSticker(false)
+      return
+    }
+    sendMessage(event, 'sticker')
+  }, [sticker])
 
   //send message function
   const sendMessage = (e, type) => {
@@ -220,7 +221,7 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
           chatsSnapshot?.docs?.[0]?.data().theme
         )})`,
       }}
-      className="relative overflow-hidden scrollbar-hide h-screen bg-no-repeat bg-center bg-cover"
+      className="relative overflow-hidden scrollbar-hide bg-no-repeat bg-center bg-cover"
     >
       <div
         className={`${
@@ -290,7 +291,7 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
       <div className="p-[30px] overflow-scroll scrollbar-hide h-screen">
         {showMessages()}
         {/* End of message */}
-        <div className="mb-[130px]" ref={endOfMessageRef}></div>
+        <div className="mb-[100px] mt-[150px]" ref={endOfMessageRef}></div>
       </div>
 
       {/* Send message box */}
@@ -350,14 +351,13 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
             onChange={(e) => setInput(e.target.value)}
           />
           <button
-            hidden
             disabled={!input}
             type="submit"
             onClick={(e) => sendMessage(event, 'text')}
           >
-            Send message
+            <SendIcon />
           </button>
-          <MicIcon />
+          {/* <MicIcon /> */}
         </form>
       </div>
     </div>
