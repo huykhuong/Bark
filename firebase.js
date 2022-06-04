@@ -2,6 +2,7 @@ import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import 'firebase/compat/firestore'
 import localforage from 'localforage'
+import cookie from 'js-cookie'
 import { getStorage } from 'firebase/storage'
 import { getMessaging, getToken, onMessage } from 'firebase/messaging'
 
@@ -30,7 +31,8 @@ const storage = getStorage(app)
 
 const firebaseCloudMessaging = {
   tokenInlocalforage: async () => {
-    const token = await localforage.getItem('fcm_token')
+    // await localforage.getItem('fcm_token')
+    const token = await cookie.get('fcm_token')
     console.log('fcm_token tokenInlocalforage', token)
     return token
   },
@@ -60,7 +62,8 @@ const firebaseCloudMessaging = {
           if (currentToken) {
             // Send the token to your server and update the UI if necessary
             // save the token in your database
-            localforage.setItem('fcm_token', currentToken)
+            // localforage.setItem('fcm_token', currentToken)
+            document.cookie = `fcm_token=${currentToken}; expires=Thu, 18 Dec 2025 12:00:00 UTC;`
             console.log('fcm_token', currentToken)
           } else {
             // Show permission request UI

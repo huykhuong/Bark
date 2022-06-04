@@ -152,10 +152,7 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
         photoURL: user.photoURL,
         type: type,
       })
-    triggerBarkSound()
-    setInput('')
-    setEmoji('')
-    scrollToBottom()
+
     if (user) {
       ;(async () => {
         const rawResponse = await fetch('https://fcm.googleapis.com/fcm/send', {
@@ -168,10 +165,11 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
           body: JSON.stringify({
             notification: {
               title: 'Bark',
-              body: 'You have a new message, join back in and bark.',
+              body: `${renderNickname(nicknamesArray, user.email)}: ${input}`,
               icon: '/favicon.ico',
             },
-            registration_ids: await localforage.getItem('fcm_token'),
+            to: 'c0G5E4l5HunToNLdRy9KUH:APA91bEAgfEP_Xfu3w4dSeBaoZY4M4FyUOPob33ZUsts3EfzpqiV3eT-dIDkswYO7dNdBlG8jaJ-_MIU9vXN3xAE668JIwdHHb2fSxyif52D8MY0TJKYfA9frAw2pPd3Vr8TgOCMZlvR',
+            // registration_ids: await localforage.getItem('fcm_token'),
             priority: 'high',
           }),
         })
@@ -180,6 +178,11 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
         // console.log(content);
       })()
     }
+
+    triggerBarkSound()
+    setInput('')
+    setEmoji('')
+    scrollToBottom()
   }
 
   // recipient snapshot

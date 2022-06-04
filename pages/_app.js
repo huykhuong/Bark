@@ -6,6 +6,7 @@ import Loading from '../components/Loading'
 import { useEffect, useState } from 'react'
 import { serverTimestamp } from 'firebase/firestore'
 import localforage from 'localforage'
+import cookie from 'js-cookie'
 import Head from 'next/head'
 
 function MyApp({ Component, pageProps }) {
@@ -38,7 +39,7 @@ function MyApp({ Component, pageProps }) {
               email: user.email,
               lastSeen: serverTimestamp(),
               photoURL: user.photoURL,
-              FCM_id: await localforage.getItem('fcm_token'),
+              FCM_id: await cookie.get('fcm_token'),
             },
             { merge: true }
           )

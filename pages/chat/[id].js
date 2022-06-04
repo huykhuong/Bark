@@ -6,6 +6,7 @@ import { auth, db } from '../../firebase'
 import getRecipientEmail from '../../utils/getRecipientEmail'
 import Sidebar from '../../components/Sidebar'
 import { Toaster } from 'react-hot-toast'
+import cookie from 'js-cookie'
 
 const ChatPage = ({ messages, chat }) => {
   const [user] = useAuthState(auth)
