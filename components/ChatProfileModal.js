@@ -2,17 +2,22 @@ import { doc, updateDoc } from 'firebase/firestore'
 import { useRouter } from 'next/router'
 import React, { useRef, useState } from 'react'
 import { db } from '../firebase'
+import dynamic from 'next/dynamic'
+const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false })
 
 const ChatProfileModal = ({
   openProfileModal,
   setOpenProfileModal,
   nickname,
   userEmail,
+  emoji,
   chat,
 }) => {
   const [input, setInput] = useState('')
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const inputRef = useRef(null)
   const router = useRouter()
+  const docRef = doc(db, 'chats', router.query.id)
 
   const gradientThemes = [
     'bg-gradient-to-br from-green-300 via-blue-500 to-purple-600',
@@ -30,10 +35,17 @@ const ChatProfileModal = ({
 
   // change theme function
   const changeTheme = (theme) => {
-    const docRef = doc(db, 'chats', router.query.id)
     updateDoc(docRef, {
       theme: theme,
     })
+  }
+
+  // Emoji Pick Function
+  const emojiPick = (e, emojiObject) => {
+    updateDoc(docRef, {
+      emoji: emojiObject.emoji,
+    })
+    setShowEmojiPicker(false)
   }
 
   // update function
@@ -62,12 +74,29 @@ const ChatProfileModal = ({
   }
 
   return (
-    <div hidden={!openProfileModal} className="relative w-screen h-screen">
-      {/* overlay */}
+    <div
+      // onClick={() => setShowEmojiPicker(false)}
+      hidden={!openProfileModal}
+      className="relative w-screen h-screen"
+    >
+      {/* overlay sections */}
+      {/* overall overlay */}
       <div
         onClick={() => setOpenProfileModal(false)}
         className="absolute top-0 bottom-0 left-0 right-0 bg-black bg-opacity-70"
       ></div>
+      {/* emoji picker overlay */}
+      <div
+        hidden={!showEmojiPicker ? true : false}
+        onClick={() => setShowEmojiPicker(false)}
+        className="fixed z-10 top-0 bottom-0 left-0 right-0 bg-black bg-opacity-70"
+      ></div>
+      {/* emoji picker */}
+      {showEmojiPicker && (
+        <div className="w-[95%] fixed bottom-3 z-[11] left-1/2 -translate-x-1/2">
+          <Picker pickerStyle={{ width: '100%' }} onEmojiClick={emojiPick} />
+        </div>
+      )}
 
       {/* modal box */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[50vh] p-5 bg-white rounded-md text-center overflow-y-auto">
@@ -131,6 +160,17 @@ const ChatProfileModal = ({
               ></div>
             ))}
           </div>
+        </div>
+
+        {/* Change EMOJI area */}
+        <div className="relative mt-10 mx-auto w-[90%] h-auto flex items-center space-x-10">
+          <h2 className="w-fit font-medium">Emoji</h2>
+          <p
+            onClick={() => setShowEmojiPicker((value) => !value)}
+            className="text-[30px]"
+          >
+            {emoji}
+          </p>
         </div>
       </div>
     </div>

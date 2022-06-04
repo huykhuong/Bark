@@ -7,6 +7,7 @@ import MenuIcon from '@material-ui/icons/Menu'
 import ImageIcon from '@material-ui/icons/Image'
 import SendIcon from '@material-ui/icons/Send'
 import { useCollection } from 'react-firebase-hooks/firestore'
+import localforage from 'localforage'
 import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon'
 import MicIcon from '@material-ui/icons/Mic'
 import LabelIcon from '@material-ui/icons/Label'
@@ -31,9 +32,6 @@ import { renderThemeBackground } from '../utils/renderThemeBackground'
 const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false })
 
 const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
-  const [firstTimeImage, setFirstTimeImage] = useState(true)
-  const [firstTimeSticker, setFirstTimeSticker] = useState(true)
-
   const [user] = useAuthState(auth)
 
   const imageUploadRef = useRef()
@@ -44,6 +42,7 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
   const [imageURL, setImageURL] = useState('')
   const [openStickersArea, setOpenStickersArea] = useState(false)
   const [sticker, setSticker] = useState('')
+  const [emoji, setEmoji] = useState('')
   const [openProfileModal, setOpenProfileModal] = useState(false)
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
@@ -103,21 +102,27 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
 
   //useEffect to upload the image
   useEffect(() => {
-    if (firstTimeImage) {
-      setFirstTimeImage(false)
-      return
-    }
+    if (imageURL === '') return
+
     sendMessage(event, 'image')
+    setImageURL('')
   }, [imageURL])
 
   //useEffect to upload the sticker
   useEffect(() => {
-    if (firstTimeSticker) {
-      setFirstTimeSticker(false)
-      return
-    }
+    if (sticker === '') return
+
     sendMessage(event, 'sticker')
+    setSticker('')
   }, [sticker])
+
+  //useEffect to upload EMOJI
+  useEffect(() => {
+    if (emoji === '') return
+    sendMessage(event, 'emoji')
+
+    setEmoji('')
+  }, [emoji])
 
   //send message function
   const sendMessage = (e, type) => {
@@ -136,14 +141,45 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
       .add({
         timestamp: serverTimestamp(),
         message:
-          type === 'text' ? input : type === 'sticker' ? sticker : imageURL,
+          type === 'text'
+            ? input
+            : type === 'sticker'
+            ? sticker
+            : type === 'emoji'
+            ? emoji
+            : imageURL,
         user: user.email,
         photoURL: user.photoURL,
         type: type,
       })
     triggerBarkSound()
     setInput('')
+    setEmoji('')
     scrollToBottom()
+    if (user) {
+      ;(async () => {
+        const rawResponse = await fetch('https://fcm.googleapis.com/fcm/send', {
+          method: 'POST',
+          headers: {
+            Authorization:
+              'key=AAAA7vd6DQ0:APA91bEtr_y72o20kjVpbnOjCojPrFc_UQo-zGnBm4qlxchXpaXYf4ZQKbrKBUhsTxTIF15m1VfYZQGnlesr5fkkzxi4qUgs_firc3j03iYZBeTkpU8JiWBIRBlYldhOJiAQMYYWsyPm',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            notification: {
+              title: 'Bark',
+              body: 'You have a new message, join back in and bark.',
+              icon: '/favicon.ico',
+            },
+            registration_ids: await localforage.getItem('fcm_token'),
+            priority: 'high',
+          }),
+        })
+
+        // const content = await rawResponse.json();
+        // console.log(content);
+      })()
+    }
   }
 
   // recipient snapshot
@@ -214,6 +250,8 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
   const recipient = recipientSnapshot?.docs?.[0]?.data()
   const recipientEmail = getRecipientEmail(chat.users, user)
 
+  const emojiRef = useRef(null)
+
   return (
     <div
       style={{
@@ -234,6 +272,7 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
           setOpenProfileModal={setOpenProfileModal}
           nickname={renderNickname(nicknamesArray, user.email)}
           userEmail={user.email}
+          emoji={chatsSnapshot?.docs?.[0]?.data().emoji}
           chat={chat}
         />
       </div>
@@ -298,7 +337,7 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
       {/* Send message box */}
       {showEmojiPicker && (
         <Picker
-          pickerStyle={{ width: '40%', position: 'fixed', bottom: 80 }}
+          pickerStyle={{ width: '70%', position: 'fixed', bottom: 80 }}
           onEmojiClick={emojiPick}
         />
       )}
@@ -323,11 +362,11 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
           chatsSnapshot ? chatsSnapshot?.docs?.[0]?.data().theme : 'bg-white'
         } `}
       >
-        <form className=" w-screen flex items-center p-[10px] z-100 lg:w-[calc(100vw-388.625px)]">
-          <InsertEmoticonIcon
+        <form className="w-screen flex items-center p-[10px] z-100 lg:w-[calc(100vw-388.625px)]">
+          {/* <InsertEmoticonIcon
             className="cursor-pointer mr-3"
             onClick={() => setShowEmojiPicker((value) => !value)}
-          />
+          /> */}
           <ImageIcon
             className="cursor-pointer mr-3"
             onClick={() => imageUploadRef.current.click()}
@@ -359,7 +398,14 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
           >
             <SendIcon />
           </button>
-          <div>💕</div>
+
+          <input
+            value={`${chatsSnapshot?.docs?.[0]?.data().emoji}`}
+            hidden={input ? true : false}
+            className="p-0 w-9 bg-transparent text-[24px]"
+            ref={emojiRef}
+            onClick={(e) => setEmoji(e.target.value)}
+          ></input>
 
           {/* <MicIcon /> */}
         </form>

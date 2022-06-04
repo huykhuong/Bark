@@ -1,7 +1,9 @@
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import 'firebase/compat/firestore'
+import localforage from 'localforage'
 import { getStorage } from 'firebase/storage'
+import { getMessaging, getToken, onMessage } from 'firebase/messaging'
 
 // whatsapp-1759a.firebaseapp.com
 
@@ -26,4 +28,56 @@ const provider = new firebase.auth.GoogleAuthProvider()
 
 const storage = getStorage(app)
 
-export { db, auth, provider, storage }
+const firebaseCloudMessaging = {
+  tokenInlocalforage: async () => {
+    const token = await localforage.getItem('fcm_token')
+    console.log('fcm_token tokenInlocalforage', token)
+    return token
+  },
+  onMessage: async () => {
+    const messaging = getMessaging()
+    onMessage(messaging, (payload) => {
+      console.log('Message received. ', payload)
+      alert('Notificacion')
+    })
+  },
+
+  init: async function () {
+    try {
+      if ((await this.tokenInlocalforage()) !== null) {
+        console.log('it already exists')
+        return false
+      }
+      console.log('it is creating it.')
+      const messaging = getMessaging(app)
+      await Notification.requestPermission()
+      getToken(messaging, {
+        vapidKey:
+          'BFv92flyF5cx6an3eOX7mFXAaTUiMjQ4TyKapJo_oiO-ZWacfCryw58PKVbiVMjVLe964nLcqGjAjTxXA8zWpKQ',
+      })
+        .then((currentToken) => {
+          console.log('current Token', currentToken)
+          if (currentToken) {
+            // Send the token to your server and update the UI if necessary
+            // save the token in your database
+            localforage.setItem('fcm_token', currentToken)
+            console.log('fcm_token', currentToken)
+          } else {
+            // Show permission request UI
+            console.log(
+              'NOTIFICACION, No registration token available. Request permission to generate one.'
+            )
+            // ...
+          }
+        })
+        .catch((err) => {
+          console.log('NOTIFICACIONAn error occurred while retrieving token . ')
+          console.log(err)
+        })
+    } catch (error) {
+      console.error(error)
+    }
+  },
+}
+
+export { db, auth, provider, storage, firebaseCloudMessaging }

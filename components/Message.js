@@ -42,6 +42,13 @@ const Message = ({ user, message, chat_theme }) => {
             {message.timestamp ? moment(message.timestamp).calendar() : ''}
           </span>
         </div>
+      ) : message.type === 'emoji' ? (
+        <p className={`${generalMessageStyle} text-[50px]`}>
+          {message.message}
+          <span className="text-gray opacity-70 p-[10px] text-[9px] absolute bottom-0 text-right right-0">
+            {message.timestamp ? moment(message.timestamp).calendar() : ''}
+          </span>
+        </p>
       ) : (
         <div
           className={`${generalMessageStyle} p-0 ${

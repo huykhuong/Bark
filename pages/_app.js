@@ -1,25 +1,48 @@
 import '../styles/globals.css'
 import { useAuthState } from 'react-firebase-hooks/auth'
-import { auth, db } from '../firebase'
+import { auth, db, firebaseCloudMessaging } from '../firebase'
 import Login from './login'
 import Loading from '../components/Loading'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { serverTimestamp } from 'firebase/firestore'
+import localforage from 'localforage'
 import Head from 'next/head'
 
 function MyApp({ Component, pageProps }) {
   const [user, loading] = useAuthState(auth)
+  const [mounted, setMounted] = useState(false)
+
+  if (mounted) {
+    firebaseCloudMessaging.onMessage()
+  }
+  useEffect(() => {
+    firebaseCloudMessaging.init()
+    const setToken = async () => {
+      const token = await firebaseCloudMessaging.tokenInlocalforage()
+      if (token) {
+        setMounted(true)
+        // not working
+      }
+    }
+    const result = setToken()
+    console.log('result', result)
+  }, [])
 
   useEffect(() => {
     if (user) {
-      db.collection('users').doc(user.uid).set(
-        {
-          email: user.email,
-          lastSeen: serverTimestamp(),
-          photoURL: user.photoURL,
-        },
-        { merge: true }
-      )
+      ;(async () => {
+        db.collection('users')
+          .doc(user.uid)
+          .set(
+            {
+              email: user.email,
+              lastSeen: serverTimestamp(),
+              photoURL: user.photoURL,
+              FCM_id: await localforage.getItem('fcm_token'),
+            },
+            { merge: true }
+          )
+      })()
     }
   }, [user])
 
