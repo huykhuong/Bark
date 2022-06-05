@@ -32,17 +32,15 @@ function MyApp({ Component, pageProps }) {
   useEffect(() => {
     if (user) {
       ;(async () => {
-        db.collection('users')
-          .doc(user.uid)
-          .set(
-            {
-              email: user.email,
-              lastSeen: serverTimestamp(),
-              photoURL: user.photoURL,
-              FCM_id: await cookie.get('fcm_token'),
-            },
-            { merge: true }
-          )
+        db.collection('users').doc(user.uid).set(
+          {
+            email: user.email,
+            lastSeen: serverTimestamp(),
+            photoURL: user.photoURL,
+            // FCM_id: await cookie.get('fcm_token'),
+          },
+          { merge: true }
+        )
       })()
     }
   }, [user])

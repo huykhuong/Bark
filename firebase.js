@@ -31,9 +31,10 @@ const storage = getStorage(app)
 
 const firebaseCloudMessaging = {
   tokenInlocalforage: async () => {
-    const token = await localforage.getItem('fcm_token')
+    const token = null
+    // await localforage.getItem('fcm_token')
     // const token = await cookie.get('fcm_token')
-    console.log('fcm_token tokenInlocalforage', token)
+    // alert('fcm_token tokenInlocalforage', token)
     return token
   },
   onMessage: async () => {
@@ -64,14 +65,8 @@ const firebaseCloudMessaging = {
             // save the token in your database
             // localforage.setItem('fcm_token', currentToken)
             document.cookie = `fcm_token=${currentToken}; expires=Thu, 18 Dec 2025 12:00:00 UTC;`
-            alert(currentToken)(async () => {
-              db.collection('users').doc(user.uid).set(
-                {
-                  FCM_id: currentToken,
-                },
-                { merge: true }
-              )
-            })()
+            alert(currentToken)
+            alert('working')
           } else {
             // Show permission request UI
             console.log(
