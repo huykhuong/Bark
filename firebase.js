@@ -31,7 +31,7 @@ const storage = getStorage(app)
 
 const firebaseCloudMessaging = {
   tokenInlocalforage: async () => {
-    await localforage.getItem('fcm_token')
+    const token = await localforage.getItem('fcm_token')
     // const token = await cookie.get('fcm_token')
     console.log('fcm_token tokenInlocalforage', token)
     return token
