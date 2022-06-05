@@ -29,6 +29,7 @@ import { v4 } from 'uuid'
 import toast from 'react-hot-toast'
 import ChatProfileModal from './ChatProfileModal'
 import { renderThemeBackground } from '../utils/renderThemeBackground'
+import filterFCMId from '../utils/filterFCMId'
 const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false })
 
 const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
@@ -44,8 +45,13 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
   const [sticker, setSticker] = useState('')
   const [emoji, setEmoji] = useState('')
   const [openProfileModal, setOpenProfileModal] = useState(false)
-
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  const FCMIds = [
+    'eBl1SOVrsXZOABXv3pEKVz:APA91bHK4s-Vnqk2E_cxfFS05AK12Z5k6qajeXOLvD-2_eoqlezGe6FkNNEofIEOvXcmszbw5Q2rXrcU2_5um8dbdudotIMDRd6HLjRjFFS8ucDwLj2HzI6KunGxHkUk0jIIgZyC1Z-u',
+    'c0G5E4l5HunToNLdRy9KUH:APA91bEAgfEP_Xfu3w4dSeBaoZY4M4FyUOPob33ZUsts3EfzpqiV3eT-dIDkswYO7dNdBlG8jaJ-_MIU9vXN3xAE668JIwdHHb2fSxyif52D8MY0TJKYfA9frAw2pPd3Vr8TgOCMZlvR',
+    'cebegEUq3nFUFZTLjUXvwA:APA91bGB24fCiL3nbcejov4B4XsGTgxBUUXRhRr31nk4hODVDGVIVWeZ75EDLNnZHxBYUAkfAaU6IL-sSpHLxuORZJMNLyDQ2yZRTwBmcxo2GJ9rHMrMWNRvTwoAMTWRib9O2CqR2wfX',
+  ]
+
   const router = useRouter()
   const [messagesSnapshot] = useCollection(
     db
@@ -168,9 +174,13 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
               body: `${renderNickname(nicknamesArray, user.email)}: ${input}`,
               icon: '/favicon.ico',
             },
-            to: 'c0G5E4l5HunToNLdRy9KUH:APA91bEAgfEP_Xfu3w4dSeBaoZY4M4FyUOPob33ZUsts3EfzpqiV3eT-dIDkswYO7dNdBlG8jaJ-_MIU9vXN3xAE668JIwdHHb2fSxyif52D8MY0TJKYfA9frAw2pPd3Vr8TgOCMZlvR',
-            // registration_ids: await localforage.getItem('fcm_token'),
+
+            registration_ids: filterFCMId(
+              FCMIds,
+              await localforage.getItem('fcm_token')
+            ),
             priority: 'high',
+            click_action: `https://bark-eight.vercel.app/chat/${chat.id}`,
           }),
         })
 

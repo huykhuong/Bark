@@ -33,13 +33,13 @@ const firebaseCloudMessaging = {
   tokenInlocalforage: async () => {
     const token = await localforage.getItem('fcm_token')
     // const token = await cookie.get('fcm_token')
-    console.log('fcm_token tokenInlocalforage', token)
+    // console.log('fcm_token tokenInlocalforage', token)
     return token
   },
   onMessage: async () => {
     const messaging = getMessaging()
     onMessage(messaging, (payload) => {
-      console.log('Message received. ', payload)
+      // console.log('Message received. ', payload)
       alert('Notificacion')
     })
   },
@@ -58,13 +58,13 @@ const firebaseCloudMessaging = {
           'BFv92flyF5cx6an3eOX7mFXAaTUiMjQ4TyKapJo_oiO-ZWacfCryw58PKVbiVMjVLe964nLcqGjAjTxXA8zWpKQ',
       })
         .then((currentToken) => {
-          console.log('current Token', currentToken)
+          // console.log('current Token', currentToken)
           if (currentToken) {
             // Send the token to your server and update the UI if necessary
             // save the token in your database
             localforage.setItem('fcm_token', currentToken)
             // document.cookie = `fcm_token=${currentToken}; expires=Thu, 18 Dec 2025 12:00:00 UTC;`
-            console.log('fcm_token', currentToken)
+            // console.log('fcm_token', currentToken)
           } else {
             // Show permission request UI
             console.log(
