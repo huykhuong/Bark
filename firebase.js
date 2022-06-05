@@ -34,6 +34,7 @@ const firebaseCloudMessaging = {
     // await localforage.getItem('fcm_token')
     const token = await cookie.get('fcm_token')
     console.log('fcm_token tokenInlocalforage', token)
+    alert(token)
     return token
   },
   onMessage: async () => {
