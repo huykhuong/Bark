@@ -47,9 +47,12 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
   const [openProfileModal, setOpenProfileModal] = useState(false)
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const FCMIds = [
-    'eBl1SOVrsXZOABXv3pEKVz:APA91bHK4s-Vnqk2E_cxfFS05AK12Z5k6qajeXOLvD-2_eoqlezGe6FkNNEofIEOvXcmszbw5Q2rXrcU2_5um8dbdudotIMDRd6HLjRjFFS8ucDwLj2HzI6KunGxHkUk0jIIgZyC1Z-u',
+    'c9VnvBsMcq0hrml_WLRd0a:APA91bHODMM1bYg_0u48E2zpbV1bV-OgzX2-e51ewtNsYkmkv6NM8b0zBdgOThP07DeL-tM4M9KUd2ecohtm4Z1SkWGok-OnysgQd1w4y6XCoOSR0mJGXc-9D6oU2svp_njAZOJjcxY-',
     'c0G5E4l5HunToNLdRy9KUH:APA91bEAgfEP_Xfu3w4dSeBaoZY4M4FyUOPob33ZUsts3EfzpqiV3eT-dIDkswYO7dNdBlG8jaJ-_MIU9vXN3xAE668JIwdHHb2fSxyif52D8MY0TJKYfA9frAw2pPd3Vr8TgOCMZlvR',
     'cebegEUq3nFUFZTLjUXvwA:APA91bGB24fCiL3nbcejov4B4XsGTgxBUUXRhRr31nk4hODVDGVIVWeZ75EDLNnZHxBYUAkfAaU6IL-sSpHLxuORZJMNLyDQ2yZRTwBmcxo2GJ9rHMrMWNRvTwoAMTWRib9O2CqR2wfX',
+    'etjL9vC_NL4_jME6Cl67Eo:APA91bFv4l_897gAmYzz2YXM8Ia1eiu7GZO0WhmApN9r_xjWSAg-V0KcG1dECainCsDx8K49FgBa0OnkMerCNqj0mSGUSW7nrXB-0MvNo3VJSdRrdOBwxZQ4iOSiFXzyt4YfipM3yaPW',
+    'eyDCciwSEF6c1TBT1uesxa:APA91bFUFtRn-NxXZACYTlf-E1OG7LZeQaMfgkS6iwaYvMHujQgp_z3dTCYhgrnGX7pPOw7Mm8aqnO5egO4ik3MFJ0tcEeLwyrlWP_6TTxRBLUGEO27H83n9MWdtvp0h2hZd85uO1FQS',
+    'dcN8Ii0J6nLv5_gFJXWAhC:APA91bF4XWEHN-cyf-FdwfQYeGjkmutaf041xW3pBW5oof0o1CqMKhzzDi8Q_jroA5y1xOqZqEfFauCG4Q4jVWy_khoIDS68RkjiDTelk0dzdSj2zl6o6MNAhWyi97zS0PgX1FcKlYmf',
   ]
 
   const router = useRouter()
