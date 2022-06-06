@@ -94,10 +94,7 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
   }
 
   const scrollToBottom = () => {
-    endOfMessageRef.current.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    })
+    endOfMessageRef.current.scrollIntoView({})
   }
 
   useEffect(() => {
@@ -106,6 +103,8 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
 
   //useEffect to upload the image
   useEffect(() => {
+    if (image === null) return
+
     uploadImage()
   }, [image])
 
@@ -114,6 +113,7 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
     if (imageURL === '') return
 
     sendMessage(event, 'image')
+    setImage(null)
     setImageURL('')
   }, [imageURL])
 
@@ -207,49 +207,82 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
 
   const showMessages = () => {
     if (messagesSnapshot) {
+      scrollToBottom()
       return messagesSnapshot.docs.map((message, index) => (
-        <div className={`flex items-end`} key={message.id}>
-          {(isSameSender(messagesSnapshot.docs, message, index, user.email) ||
-            isLastMessage(messagesSnapshot.docs, index, user.email)) && (
-            <Avatar src={message.data().photoURL}></Avatar>
-          )}
-          <div
-            style={{
-              marginLeft: isSameSenderMargin(
-                messagesSnapshot.docs,
-                message,
-                index,
-                user.email
-              ),
-              marginTop: isSameUser(
-                messagesSnapshot.docs,
-                message,
-                index,
-                user.email
-              )
-                ? 0
-                : 60,
-            }}
-            className={`${user.email === message.data().user && 'ml-auto'}`}
-          >
-            {!isSameUser(messagesSnapshot.docs, message, index, user.email) &&
-              message.data().user !== user.email &&
-              chat.type === 'group' && (
-                <p className="ml-[12px] text-sm text-gray-600">
-                  {renderNickname(nicknamesArray, message.data().user)}
-                </p>
-              )}
-            <Message
+        <>
+          {message.data().type === 'event' ? (
+            <div
               key={message.id}
-              user={message.data().user}
-              chat_theme={chatsSnapshot?.docs?.[0]?.data().theme}
-              message={{
-                ...message.data(),
-                timestamp: message.data().timestamp?.toDate().getTime(),
-              }}
-            />
-          </div>
-        </div>
+              className="mt-[60px] text-gray-300 max-w-[92%] text-center mx-auto"
+            >
+              {message.data().message.includes('gradient') ? (
+                <div>
+                  {message.data().nickname} changed the group theme to
+                  <div
+                    className={`ml-2 inline-block align-bottom rounded-full h-7 w-7 ${
+                      message.data().message
+                    }`}
+                  ></div>
+                </div>
+              ) : (
+                message.data().message
+              )}
+            </div>
+          ) : (
+            <div className={`flex items-end`} key={message.id}>
+              {(isSameSender(
+                messagesSnapshot.docs,
+                message,
+                index,
+                user.email
+              ) ||
+                isLastMessage(messagesSnapshot.docs, index, user.email)) && (
+                <Avatar src={message.data().photoURL}></Avatar>
+              )}
+              <div
+                style={{
+                  marginLeft: isSameSenderMargin(
+                    messagesSnapshot.docs,
+                    message,
+                    index,
+                    user.email
+                  ),
+                  marginTop: isSameUser(
+                    messagesSnapshot.docs,
+                    message,
+                    index,
+                    user.email
+                  )
+                    ? 0
+                    : 60,
+                }}
+                className={`${user.email === message.data().user && 'ml-auto'}`}
+              >
+                {!isSameUser(
+                  messagesSnapshot.docs,
+                  message,
+                  index,
+                  user.email
+                ) &&
+                  message.data().user !== user.email &&
+                  chat.type === 'group' && (
+                    <p className="ml-[12px] text-sm text-gray-300">
+                      {renderNickname(nicknamesArray, message.data().user)}
+                    </p>
+                  )}
+                <Message
+                  key={message.id}
+                  user={message.data().user}
+                  chat_theme={chatsSnapshot?.docs?.[0]?.data().theme}
+                  message={{
+                    ...message.data(),
+                    timestamp: message.data().timestamp?.toDate().getTime(),
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </>
       ))
     } else {
       return JSON.parse(messages).map((message) => (
@@ -288,8 +321,10 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
           setOpenProfileModal={setOpenProfileModal}
           nickname={renderNickname(nicknamesArray, user.email)}
           userEmail={user.email}
+          userPhotoURL={user.photoURL}
           emoji={chatsSnapshot?.docs?.[0]?.data().emoji}
           chat={chat}
+          scrollToBottom={scrollToBottom}
         />
       </div>
 

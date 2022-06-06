@@ -1,7 +1,8 @@
 import { doc, updateDoc } from 'firebase/firestore'
 import { useRouter } from 'next/router'
-import React, { useRef, useState } from 'react'
+import React, { forwardRef, useRef, useState } from 'react'
 import { db } from '../firebase'
+import { serverTimestamp } from 'firebase/firestore'
 import dynamic from 'next/dynamic'
 const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false })
 
@@ -10,8 +11,10 @@ const ChatProfileModal = ({
   setOpenProfileModal,
   nickname,
   userEmail,
+  userPhotoURL,
   emoji,
   chat,
+  scrollToBottom,
 }) => {
   const [input, setInput] = useState('')
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
@@ -33,11 +36,28 @@ const ChatProfileModal = ({
 
   const solidTheme = ['bg-white', 'bg-gray-300', 'bg-blue-500', 'bg-red-500']
 
+  // Announce event function (change nickname, change theme, change group emoji)
+  const announceEvent = (e, content) => {
+    e.preventDefault()
+
+    db.collection('chats').doc(router.query.id).collection('messages').add({
+      timestamp: serverTimestamp(),
+      message: content,
+      type: 'event',
+      user: userEmail,
+      photoURL: userPhotoURL,
+      nickname: nickname,
+    })
+
+    scrollToBottom()
+  }
+
   // change theme function
   const changeTheme = (theme) => {
     updateDoc(docRef, {
       theme: theme,
     })
+    announceEvent(event, `${theme}`)
   }
 
   // Emoji Pick Function
@@ -45,6 +65,10 @@ const ChatProfileModal = ({
     updateDoc(docRef, {
       emoji: emojiObject.emoji,
     })
+    announceEvent(
+      event,
+      `${nickname} changed the group emoji to ${emojiObject.emoji}`
+    )
     setShowEmojiPicker(false)
   }
 
@@ -70,6 +94,7 @@ const ChatProfileModal = ({
       { merge: true }
     )
 
+    announceEvent(event, `${nickname} changed his nickname to ${input}`)
     setInput('')
   }
 
@@ -101,7 +126,7 @@ const ChatProfileModal = ({
       {/* modal box */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[50vh] p-5 bg-white rounded-md text-center overflow-y-auto">
         <h2>
-          Your fucking nickname in this group is{' '}
+          Your nickname in this group is{' '}
           <span className="font-bold">{nickname}</span>
         </h2>
 

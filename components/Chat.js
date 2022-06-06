@@ -5,6 +5,7 @@ import { auth, db } from '../firebase'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { useRouter } from 'next/router'
+import ImageIcon from '@material-ui/icons/Image'
 
 function Chat({ id, users, chat_name, chat_img_url, last_message }) {
   const [user] = useAuthState(auth)
@@ -37,7 +38,15 @@ function Chat({ id, users, chat_name, chat_img_url, last_message }) {
       )}
       <div className="flex flex-col">
         {chat_name !== '' ? <p>{chat_name}</p> : <p>{recipientEmail}</p>}
-        <p className="font-bold">{last_message}</p>
+        <p className="font-bold">
+          {last_message.includes('firebasestorage') ? (
+            <>
+              Image <ImageIcon />
+            </>
+          ) : (
+            last_message
+          )}
+        </p>
       </div>
     </div>
   )
