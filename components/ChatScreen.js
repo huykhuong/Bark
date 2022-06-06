@@ -212,24 +212,21 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
       scrollToBottom()
       return messagesSnapshot.docs.map((message, index) => (
         <>
-          {!index === 0 &&
+          {!(index === 0) &&
           compareTime(
-            new Date(message.data().timestamp?.toDate().getTime()),
+            new Date(message.data().timestamp?.toDate()),
             new Date(
-              messagesSnapshot?.docs?.[index - 1]
-                .data()
-                .timestamp?.toDate()
-                .getTime()
+              messagesSnapshot?.docs?.[index - 1].data().timestamp?.toDate()
             )
-          ) < 120 &&
+          ) > 40 &&
           message.data().type !== 'event' ? (
             <p className="mt-[60px] text-gray-300 max-w-[92%] text-center mx-auto">
-              {moment(message.data().timestamp?.toDate().getTime()).format(
-                'lll'
-              )}
+              {moment(message.data().timestamp?.toDate()) ===
+                moment(new Date()) &&
+                moment(message.data().timestamp?.toDate()).calendar()}
             </p>
           ) : (
-            'vl'
+            ''
           )}
           {message.data().type === 'event' ? (
             <div
