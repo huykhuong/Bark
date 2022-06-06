@@ -39,7 +39,7 @@ function Chat({ id, users, chat_name, chat_img_url, last_message }) {
       <div className="flex flex-col">
         {chat_name !== '' ? <p>{chat_name}</p> : <p>{recipientEmail}</p>}
         <p className="font-bold">
-          {last_message.includes('firebasestorage') ? (
+          {last_message?.includes('firebasestorage') ? (
             <>
               Image <ImageIcon />
             </>
