@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
+import moment from 'moment'
 import { auth, db, storage } from '../firebase'
 import { useRouter } from 'next/router'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
@@ -30,6 +31,7 @@ import toast from 'react-hot-toast'
 import ChatProfileModal from './ChatProfileModal'
 import { renderThemeBackground } from '../utils/renderThemeBackground'
 import filterFCMId from '../utils/filterFCMId'
+import { compareTime } from '../utils/compareDates'
 const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false })
 
 const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
@@ -210,6 +212,25 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
       scrollToBottom()
       return messagesSnapshot.docs.map((message, index) => (
         <>
+          {!index === 0 &&
+          compareTime(
+            new Date(message.data().timestamp?.toDate().getTime()),
+            new Date(
+              messagesSnapshot?.docs?.[index - 1]
+                .data()
+                .timestamp?.toDate()
+                .getTime()
+            )
+          ) < 120 &&
+          message.data().type !== 'event' ? (
+            <p className="mt-[60px] text-gray-300 max-w-[92%] text-center mx-auto">
+              {moment(message.data().timestamp?.toDate().getTime()).format(
+                'lll'
+              )}
+            </p>
+          ) : (
+            'vl'
+          )}
           {message.data().type === 'event' ? (
             <div
               key={message.id}
