@@ -33,9 +33,17 @@ import ChatProfileModal from './ChatProfileModal'
 import { renderThemeBackground } from '../utils/renderThemeBackground'
 import filterFCMId from '../utils/filterFCMId'
 import { compareTime } from '../utils/compareDates'
+import { isTypingArrayInclude } from '../utils/isTypingArrayInclude'
+import { getIsTypingAvatar } from '../utils/getIsTypingAvatar'
 const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false })
 
-const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
+const ChatScreen = ({
+  messages,
+  chat,
+  allUsers,
+  setOpenSideBar,
+  openSideBar,
+}) => {
   const [user] = useAuthState(auth)
 
   const imageUploadRef = useRef()
@@ -108,7 +116,7 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
     if (input !== '') return
 
     updateDoc(doc(db, 'chats', router.query.id), {
-      isTyping: arrayRemove(renderNickname(nicknamesArray, user.email)),
+      isTyping: arrayRemove(user.email),
     })
   }, [input])
 
@@ -173,35 +181,35 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
         type: type,
       })
 
-    // if (user) {
-    //   ;(async () => {
-    //     const rawResponse = await fetch('https://fcm.googleapis.com/fcm/send', {
-    //       method: 'POST',
-    //       headers: {
-    //         Authorization:
-    //           'key=AAAA7vd6DQ0:APA91bEtr_y72o20kjVpbnOjCojPrFc_UQo-zGnBm4qlxchXpaXYf4ZQKbrKBUhsTxTIF15m1VfYZQGnlesr5fkkzxi4qUgs_firc3j03iYZBeTkpU8JiWBIRBlYldhOJiAQMYYWsyPm',
-    //         'Content-Type': 'application/json',
-    //       },
-    //       body: JSON.stringify({
-    //         notification: {
-    //           title: 'Bark',
-    //           body: `${renderNickname(nicknamesArray, user.email)}: ${input}`,
-    //           icon: '/favicon.ico',
-    //         },
+    if (user) {
+      ;(async () => {
+        const rawResponse = await fetch('https://fcm.googleapis.com/fcm/send', {
+          method: 'POST',
+          headers: {
+            Authorization:
+              'key=AAAA7vd6DQ0:APA91bEtr_y72o20kjVpbnOjCojPrFc_UQo-zGnBm4qlxchXpaXYf4ZQKbrKBUhsTxTIF15m1VfYZQGnlesr5fkkzxi4qUgs_firc3j03iYZBeTkpU8JiWBIRBlYldhOJiAQMYYWsyPm',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            notification: {
+              title: 'Bark',
+              body: `${renderNickname(nicknamesArray, user.email)}: ${input}`,
+              icon: '/favicon.ico',
+            },
 
-    //         registration_ids: filterFCMId(
-    //           FCMIds,
-    //           await localforage.getItem('fcm_token')
-    //         ),
-    //         priority: 'high',
-    //         click_action: `https://bark-eight.vercel.app/chat/${chat.id}`,
-    //       }),
-    //     })
+            registration_ids: filterFCMId(
+              FCMIds,
+              await localforage.getItem('fcm_token')
+            ),
+            priority: 'high',
+            click_action: `https://bark-eight.vercel.app/chat/${chat.id}`,
+          }),
+        })
 
-    //     // const content = await rawResponse.json();
-    //     // console.log(content);
-    //   })()
-    // }
+        // const content = await rawResponse.json();
+        // console.log(content);
+      })()
+    }
 
     triggerBarkSound()
     setInput('')
@@ -219,100 +227,136 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
   const showMessages = () => {
     if (messagesSnapshot) {
       scrollToBottom()
-      return messagesSnapshot.docs.map((message, index) => (
-        <>
-          {!(index === 0) &&
-          compareTime(
-            new Date(message.data().timestamp?.toDate()),
-            new Date(
-              messagesSnapshot?.docs?.[index - 1].data().timestamp?.toDate()
-            )
-          ) > 40 &&
-          message.data().type !== 'event' ? (
-            <p className="mt-[60px] text-white max-w-[92%] text-center mx-auto">
-              {message.data().timestamp?.toDate().getDate() ===
-              new Date().getDate()
-                ? moment(message.data().timestamp?.toDate()).calendar()
-                : moment(message.data().timestamp?.toDate()).format('lll')}
-            </p>
-          ) : (
-            ''
-          )}
+      return (
+        <div>
+          {messagesSnapshot.docs.map((message, index) => (
+            <>
+              {!(index === 0) &&
+              compareTime(
+                new Date(message.data().timestamp?.toDate()),
+                new Date(
+                  messagesSnapshot?.docs?.[index - 1].data().timestamp?.toDate()
+                )
+              ) > 40 &&
+              message.data().type !== 'event' ? (
+                <p className="mt-[60px] text-white max-w-[92%] text-center mx-auto">
+                  {message.data().timestamp?.toDate().getDate() ===
+                  new Date().getDate()
+                    ? moment(message.data().timestamp?.toDate()).calendar()
+                    : moment(message.data().timestamp?.toDate()).format('lll')}
+                </p>
+              ) : (
+                ''
+              )}
 
-          {message.data().type === 'event' ? (
-            <div
-              key={message.id}
-              className="mt-[60px] text-gray-300 max-w-[92%] text-center mx-auto"
-            >
-              {message.data().message.includes('gradient') ? (
-                <div>
-                  {message.data().nickname} changed the group theme to
-                  <div
-                    className={`ml-2 inline-block align-bottom rounded-full h-7 w-7 ${
-                      message.data().message
-                    }`}
-                  ></div>
+              {message.data().type === 'event' ? (
+                <div
+                  key={message.id}
+                  className="mt-[60px] text-gray-300 max-w-[92%] text-center mx-auto"
+                >
+                  {message.data().message.includes('gradient') ? (
+                    <div>
+                      {message.data().nickname} changed the group theme to
+                      <div
+                        className={`ml-2 inline-block align-bottom rounded-full h-7 w-7 ${
+                          message.data().message
+                        }`}
+                      ></div>
+                    </div>
+                  ) : (
+                    message.data().message
+                  )}
                 </div>
               ) : (
-                message.data().message
-              )}
-            </div>
-          ) : (
-            <div className={`flex items-end`} key={message.id}>
-              {(isSameSender(
-                messagesSnapshot.docs,
-                message,
-                index,
-                user.email
-              ) ||
-                isLastMessage(messagesSnapshot.docs, index, user.email)) && (
-                <Avatar src={message.data().photoURL}></Avatar>
-              )}
-              <div
-                style={{
-                  marginLeft: isSameSenderMargin(
+                <div className={`flex items-end`} key={message.id}>
+                  {(isSameSender(
                     messagesSnapshot.docs,
                     message,
                     index,
                     user.email
-                  ),
-                  marginTop: isSameUser(
-                    messagesSnapshot.docs,
-                    message,
-                    index,
-                    user.email
-                  )
-                    ? 0
-                    : 60,
-                }}
-                className={`${user.email === message.data().user && 'ml-auto'}`}
-              >
-                {!isSameUser(
-                  messagesSnapshot.docs,
-                  message,
-                  index,
+                  ) ||
+                    isLastMessage(
+                      messagesSnapshot.docs,
+                      index,
+                      user.email
+                    )) && <Avatar src={message.data().photoURL}></Avatar>}
+                  <div
+                    style={{
+                      marginLeft: isSameSenderMargin(
+                        messagesSnapshot.docs,
+                        message,
+                        index,
+                        user.email
+                      ),
+                      marginTop: isSameUser(
+                        messagesSnapshot.docs,
+                        message,
+                        index,
+                        user.email
+                      )
+                        ? 0
+                        : 60,
+                    }}
+                    className={`${
+                      user.email === message.data().user && 'ml-auto'
+                    }`}
+                  >
+                    {!isSameUser(
+                      messagesSnapshot.docs,
+                      message,
+                      index,
+                      user.email
+                    ) &&
+                      message.data().user !== user.email &&
+                      chat.type === 'group' && (
+                        <p className="ml-[12px] text-sm text-gray-300">
+                          {renderNickname(nicknamesArray, message.data().user)}
+                        </p>
+                      )}
+                    <Message
+                      key={message.id}
+                      user={message.data().user}
+                      chat_theme={chatsSnapshot?.docs?.[0]?.data().theme}
+                      message={{
+                        ...message.data(),
+                        timestamp: message.data().timestamp?.toDate().getTime(),
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+            </>
+          ))}
+          {/* isTyping section */}
+          <div
+            className={`${
+              (chatsSnapshot?.docs?.[0]?.data().isTyping.length === 1 &&
+                isTypingArrayInclude(
+                  chatsSnapshot?.docs?.[0]?.data().isTyping,
                   user.email
-                ) &&
-                  message.data().user !== user.email &&
-                  chat.type === 'group' && (
-                    <p className="ml-[12px] text-sm text-gray-300">
-                      {renderNickname(nicknamesArray, message.data().user)}
-                    </p>
-                  )}
-                <Message
-                  key={message.id}
-                  user={message.data().user}
-                  chat_theme={chatsSnapshot?.docs?.[0]?.data().theme}
-                  message={{
-                    ...message.data(),
-                    timestamp: message.data().timestamp?.toDate().getTime(),
-                  }}
-                />
+                )) ||
+              chatsSnapshot?.docs?.[0]?.data().isTyping.length === 0
+                ? 'invisible'
+                : ''
+            }`}
+          >
+            {chatsSnapshot?.docs?.[0]?.data().isTyping.map((name, index) => (
+              <div className="flex space-x-3 items-center">
+                {name !== user.email && (
+                  <Avatar src={getIsTypingAvatar(allUsers, name)}></Avatar>
+                )}
+                {/* <p>
+                {(chatsSnapshot?.docs?.[0]?.data().isTyping.length > 1 &&
+                  index !==
+                    chatsSnapshot?.docs?.[0]?.data().isTyping.length - 1) ||
+                  (name !== user.email && ' ,')}
+              </p>{' '} */}
+                is barking ...
               </div>
-            </div>
-          )}
-        </>
-      ))
+            ))}
+          </div>
+        </div>
+      )
     } else {
       return JSON.parse(messages).map((message) => (
         <Message key={message.id} message={message} user={message.user} />
@@ -437,25 +481,6 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
         ))}
       </div>
 
-      {/* isTyping section */}
-      <div
-        className={`${
-          chatsSnapshot?.docs?.[0]?.data().isTyping.length === 0 &&
-          !user &&
-          'invisible'
-        } fixed bottom-[64px] p-2 bg-white`}
-      >
-        {chatsSnapshot?.docs?.[0]?.data().isTyping.map((user, index) => (
-          <p className="inline-block">
-            {user}
-            {chatsSnapshot?.docs?.[0]?.data().isTyping.length > 1 &&
-              index !== chatsSnapshot?.docs?.[0]?.data().isTyping.length - 1 &&
-              ' ,'}
-          </p>
-        ))}{' '}
-        is barking ...
-      </div>
-
       {/* sending message bar */}
       <div
         className={`fixed bottom-0 ${
@@ -494,7 +519,8 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
               setInput(e.target.value)
               updateDoc(doc(db, 'chats', router.query.id), {
                 isTyping: arrayUnion(
-                  renderNickname(nicknamesArray, user.email)
+                  user.email
+                  // renderNickname(nicknamesArray, user.email)
                 ),
               })
             }}

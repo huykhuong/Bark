@@ -6,11 +6,12 @@ import { auth, db } from '../../firebase'
 import getRecipientEmail from '../../utils/getRecipientEmail'
 import Sidebar from '../../components/Sidebar'
 import { Toaster } from 'react-hot-toast'
-import cookie from 'js-cookie'
 
-const ChatPage = ({ messages, chat }) => {
+const ChatPage = ({ messages, chat, allUsers }) => {
   const [user] = useAuthState(auth)
   const [openSideBar, setOpenSideBar] = useState(false)
+
+  console.log(allUsers)
 
   return (
     <div className="flex">
@@ -47,6 +48,7 @@ const ChatPage = ({ messages, chat }) => {
           messages={messages}
           openSideBar={openSideBar}
           setOpenSideBar={setOpenSideBar}
+          allUsers={allUsers}
         />
       </div>
     </div>
@@ -57,11 +59,14 @@ export default ChatPage
 
 export async function getServerSideProps(context) {
   const ref = db.collection('chats').doc(context.query.id)
+  const usersRef = db.collection('users')
 
   const messagesRes = await ref
     .collection('messages')
     .orderBy('timestamp', 'asc')
     .get()
+
+  const usersRes = await usersRef.get()
 
   const messages = messagesRes.docs
     .map((doc) => ({
@@ -79,10 +84,21 @@ export async function getServerSideProps(context) {
     ...chatRes.data(),
   }
 
+  const allUsers = usersRes.docs
+    .map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }))
+    .map((users) => ({
+      ...users,
+      lastSeen: users.lastSeen.toDate().getTime(),
+    }))
+
   return {
     props: {
       messages: JSON.stringify(messages),
       chat: chat,
+      allUsers: JSON.stringify(allUsers),
     },
   }
 }
