@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
+import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore'
 import moment from 'moment'
 import { auth, db, storage } from '../firebase'
 import { useRouter } from 'next/router'
@@ -103,6 +104,14 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
     scrollToBottom()
   }, [router.asPath])
 
+  useEffect(() => {
+    if (input !== '') return
+
+    updateDoc(doc(db, 'chats', router.query.id), {
+      isTyping: arrayRemove(renderNickname(nicknamesArray, user.email)),
+    })
+  }, [input])
+
   //useEffect to upload the image
   useEffect(() => {
     if (image === null) return
@@ -164,35 +173,35 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
         type: type,
       })
 
-    if (user) {
-      ;(async () => {
-        const rawResponse = await fetch('https://fcm.googleapis.com/fcm/send', {
-          method: 'POST',
-          headers: {
-            Authorization:
-              'key=AAAA7vd6DQ0:APA91bEtr_y72o20kjVpbnOjCojPrFc_UQo-zGnBm4qlxchXpaXYf4ZQKbrKBUhsTxTIF15m1VfYZQGnlesr5fkkzxi4qUgs_firc3j03iYZBeTkpU8JiWBIRBlYldhOJiAQMYYWsyPm',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            notification: {
-              title: 'Bark',
-              body: `${renderNickname(nicknamesArray, user.email)}: ${input}`,
-              icon: '/favicon.ico',
-            },
+    // if (user) {
+    //   ;(async () => {
+    //     const rawResponse = await fetch('https://fcm.googleapis.com/fcm/send', {
+    //       method: 'POST',
+    //       headers: {
+    //         Authorization:
+    //           'key=AAAA7vd6DQ0:APA91bEtr_y72o20kjVpbnOjCojPrFc_UQo-zGnBm4qlxchXpaXYf4ZQKbrKBUhsTxTIF15m1VfYZQGnlesr5fkkzxi4qUgs_firc3j03iYZBeTkpU8JiWBIRBlYldhOJiAQMYYWsyPm',
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify({
+    //         notification: {
+    //           title: 'Bark',
+    //           body: `${renderNickname(nicknamesArray, user.email)}: ${input}`,
+    //           icon: '/favicon.ico',
+    //         },
 
-            registration_ids: filterFCMId(
-              FCMIds,
-              await localforage.getItem('fcm_token')
-            ),
-            priority: 'high',
-            click_action: `https://bark-eight.vercel.app/chat/${chat.id}`,
-          }),
-        })
+    //         registration_ids: filterFCMId(
+    //           FCMIds,
+    //           await localforage.getItem('fcm_token')
+    //         ),
+    //         priority: 'high',
+    //         click_action: `https://bark-eight.vercel.app/chat/${chat.id}`,
+    //       }),
+    //     })
 
-        // const content = await rawResponse.json();
-        // console.log(content);
-      })()
-    }
+    //     // const content = await rawResponse.json();
+    //     // console.log(content);
+    //   })()
+    // }
 
     triggerBarkSound()
     setInput('')
@@ -220,14 +229,16 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
             )
           ) > 40 &&
           message.data().type !== 'event' ? (
-            <p className="mt-[60px] text-gray-300 max-w-[92%] text-center mx-auto">
-              {moment(message.data().timestamp?.toDate()) ===
-                moment(new Date()) &&
-                moment(message.data().timestamp?.toDate()).calendar()}
+            <p className="mt-[60px] text-white max-w-[92%] text-center mx-auto">
+              {message.data().timestamp?.toDate().getDate() ===
+              new Date().getDate()
+                ? moment(message.data().timestamp?.toDate()).calendar()
+                : moment(message.data().timestamp?.toDate()).format('lll')}
             </p>
           ) : (
             ''
           )}
+
           {message.data().type === 'event' ? (
             <div
               key={message.id}
@@ -426,6 +437,26 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
         ))}
       </div>
 
+      {/* isTyping section */}
+      <div
+        className={`${
+          chatsSnapshot?.docs?.[0]?.data().isTyping.length === 0 &&
+          !user &&
+          'invisible'
+        } fixed bottom-[64px] p-2 bg-white`}
+      >
+        {chatsSnapshot?.docs?.[0]?.data().isTyping.map((user, index) => (
+          <p className="inline-block">
+            {user}
+            {chatsSnapshot?.docs?.[0]?.data().isTyping.length > 1 &&
+              index !== chatsSnapshot?.docs?.[0]?.data().isTyping.length - 1 &&
+              ' ,'}
+          </p>
+        ))}{' '}
+        is barking ...
+      </div>
+
+      {/* sending message bar */}
       <div
         className={`fixed bottom-0 ${
           chatsSnapshot ? chatsSnapshot?.docs?.[0]?.data().theme : 'bg-white'
@@ -453,12 +484,22 @@ const ChatScreen = ({ messages, chat, setOpenSideBar, openSideBar }) => {
             className="h-6 w-6 cursor-pointer"
             onClick={() => setOpenStickersArea((prevValue) => !prevValue)}
           />
+
+          {/* text input */}
           <input
             className="flex-1 items-center p-[10px] sticky bg-white z-100 mx-[15px]"
             value={input}
             placeholder="Bark here"
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              setInput(e.target.value)
+              updateDoc(doc(db, 'chats', router.query.id), {
+                isTyping: arrayUnion(
+                  renderNickname(nicknamesArray, user.email)
+                ),
+              })
+            }}
           />
+
           <button
             hidden={!input ? true : false}
             disabled={!input}

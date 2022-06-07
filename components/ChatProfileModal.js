@@ -1,6 +1,6 @@
 import { doc, updateDoc } from 'firebase/firestore'
 import { useRouter } from 'next/router'
-import React, { forwardRef, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { db } from '../firebase'
 import { serverTimestamp } from 'firebase/firestore'
 import dynamic from 'next/dynamic'
