@@ -11,8 +11,6 @@ const ChatPage = ({ messages, chat, allUsers }) => {
   const [user] = useAuthState(auth)
   const [openSideBar, setOpenSideBar] = useState(false)
 
-  console.log(allUsers)
-
   return (
     <div className="flex">
       <Head>

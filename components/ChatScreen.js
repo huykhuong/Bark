@@ -35,6 +35,8 @@ import filterFCMId from '../utils/filterFCMId'
 import { compareTime } from '../utils/compareDates'
 import { isTypingArrayInclude } from '../utils/isTypingArrayInclude'
 import { getIsTypingAvatar } from '../utils/getIsTypingAvatar'
+import TypingDots from './TypingDots'
+import StackedAvatar from './StackedAvatarList'
 const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false })
 
 const ChatScreen = ({
@@ -327,6 +329,7 @@ const ChatScreen = ({
               )}
             </>
           ))}
+
           {/* isTyping section */}
           <div
             className={`${
@@ -336,24 +339,21 @@ const ChatScreen = ({
                   user.email
                 )) ||
               chatsSnapshot?.docs?.[0]?.data().isTyping.length === 0
-                ? 'invisible'
-                : ''
+                ? 'hidden'
+                : 'mt-[50px] flex items-center'
             }`}
           >
-            {chatsSnapshot?.docs?.[0]?.data().isTyping.map((name, index) => (
-              <div className="flex space-x-3 items-center">
-                {name !== user.email && (
-                  <Avatar src={getIsTypingAvatar(allUsers, name)}></Avatar>
+            <StackedAvatar
+              maxAvatars={2}
+              round={true}
+              size={50}
+              avatars={chatsSnapshot?.docs?.[0]
+                ?.data()
+                .isTyping.map((name) =>
+                  name !== user.email ? getIsTypingAvatar(allUsers, name) : ''
                 )}
-                {/* <p>
-                {(chatsSnapshot?.docs?.[0]?.data().isTyping.length > 1 &&
-                  index !==
-                    chatsSnapshot?.docs?.[0]?.data().isTyping.length - 1) ||
-                  (name !== user.email && ' ,')}
-              </p>{' '} */}
-                is barking ...
-              </div>
-            ))}
+            />
+            <TypingDots />
           </div>
         </div>
       )
@@ -455,7 +455,7 @@ const ChatScreen = ({
       <div className="p-[30px] overflow-scroll scrollbar-hide h-screen">
         {showMessages()}
         {/* End of message */}
-        <div className="mt-[150px]" ref={endOfMessageRef}></div>
+        <div className="mt-[120px]" ref={endOfMessageRef}></div>
       </div>
 
       {/* Send message box */}
