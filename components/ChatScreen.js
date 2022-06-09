@@ -107,7 +107,7 @@ const ChatScreen = ({
   }
 
   const scrollToBottom = () => {
-    endOfMessageRef.current.scrollIntoView({})
+    endOfMessageRef.current.scrollIntoView({ block: 'end' })
   }
 
   useEffect(() => {
@@ -181,37 +181,38 @@ const ChatScreen = ({
         user: user.email,
         photoURL: user.photoURL,
         type: type,
+        seen: [],
       })
 
-    if (user) {
-      ;(async () => {
-        const rawResponse = await fetch('https://fcm.googleapis.com/fcm/send', {
-          method: 'POST',
-          headers: {
-            Authorization:
-              'key=AAAA7vd6DQ0:APA91bEtr_y72o20kjVpbnOjCojPrFc_UQo-zGnBm4qlxchXpaXYf4ZQKbrKBUhsTxTIF15m1VfYZQGnlesr5fkkzxi4qUgs_firc3j03iYZBeTkpU8JiWBIRBlYldhOJiAQMYYWsyPm',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            notification: {
-              title: 'Bark',
-              body: `${renderNickname(nicknamesArray, user.email)}: ${input}`,
-              icon: '/favicon.ico',
-            },
+    // if (user) {
+    //   ;(async () => {
+    //     const rawResponse = await fetch('https://fcm.googleapis.com/fcm/send', {
+    //       method: 'POST',
+    //       headers: {
+    //         Authorization:
+    //           'key=AAAA7vd6DQ0:APA91bEtr_y72o20kjVpbnOjCojPrFc_UQo-zGnBm4qlxchXpaXYf4ZQKbrKBUhsTxTIF15m1VfYZQGnlesr5fkkzxi4qUgs_firc3j03iYZBeTkpU8JiWBIRBlYldhOJiAQMYYWsyPm',
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify({
+    //         notification: {
+    //           title: 'Bark',
+    //           body: `${renderNickname(nicknamesArray, user.email)}: ${input}`,
+    //           icon: '/favicon.ico',
+    //         },
 
-            registration_ids: filterFCMId(
-              FCMIds,
-              await localforage.getItem('fcm_token')
-            ),
-            priority: 'high',
-            click_action: `https://bark-eight.vercel.app/chat/${chat.id}`,
-          }),
-        })
+    //         registration_ids: filterFCMId(
+    //           FCMIds,
+    //           await localforage.getItem('fcm_token')
+    //         ),
+    //         priority: 'high',
+    //         click_action: `https://bark-eight.vercel.app/chat/${chat.id}`,
+    //       }),
+    //     })
 
-        // const content = await rawResponse.json();
-        // console.log(content);
-      })()
-    }
+    //     // const content = await rawResponse.json();
+    //     // console.log(content);
+    //   })()
+    // }
 
     triggerBarkSound()
     setInput('')
@@ -250,7 +251,6 @@ const ChatScreen = ({
               ) : (
                 ''
               )}
-
               {message.data().type === 'event' ? (
                 <div
                   key={message.id}
@@ -282,6 +282,7 @@ const ChatScreen = ({
                       index,
                       user.email
                     )) && <Avatar src={message.data().photoURL}></Avatar>}
+
                   <div
                     style={{
                       marginLeft: isSameSenderMargin(
@@ -300,8 +301,8 @@ const ChatScreen = ({
                         : 60,
                     }}
                     className={`${
-                      user.email === message.data().user && 'ml-auto'
-                    }`}
+                      user.email === message.data().user ? 'ml-auto' : 'flex-1'
+                    } `}
                   >
                     {!isSameUser(
                       messagesSnapshot.docs,
@@ -327,6 +328,25 @@ const ChatScreen = ({
                   </div>
                 </div>
               )}
+              {/* Seen section */}
+              <div
+                className={`${
+                  index === messagesSnapshot?.docs?.length - 1
+                    ? 'inline float-right mt-3'
+                    : 'hidden'
+                }`}
+              >
+                <StackedAvatar
+                  maxAvatars={2}
+                  round={true}
+                  size={10}
+                  width={20}
+                  height={20}
+                  avatars={message
+                    .data()
+                    .seen.map((name) => getIsTypingAvatar(allUsers, name))}
+                />
+              </div>
             </>
           ))}
 
@@ -347,6 +367,8 @@ const ChatScreen = ({
               maxAvatars={2}
               round={true}
               size={50}
+              width={40}
+              height={40}
               avatars={chatsSnapshot?.docs?.[0]
                 ?.data()
                 .isTyping.map((name) =>
@@ -455,7 +477,7 @@ const ChatScreen = ({
       <div className="p-[30px] overflow-scroll scrollbar-hide h-screen">
         {showMessages()}
         {/* End of message */}
-        <div className="mt-[120px]" ref={endOfMessageRef}></div>
+        <div className="mt-[150px]" ref={endOfMessageRef}></div>
       </div>
 
       {/* Send message box */}

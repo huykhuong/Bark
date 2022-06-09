@@ -1,15 +1,39 @@
 import Head from 'next/head'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import ChatScreen from '../../components/ChatScreen'
 import { auth, db } from '../../firebase'
 import getRecipientEmail from '../../utils/getRecipientEmail'
 import Sidebar from '../../components/Sidebar'
 import { Toaster } from 'react-hot-toast'
+import { useRouter } from 'next/router'
+import { arrayUnion } from 'firebase/firestore'
 
 const ChatPage = ({ messages, chat, allUsers }) => {
   const [user] = useAuthState(auth)
   const [openSideBar, setOpenSideBar] = useState(false)
+  const router = useRouter()
+
+  useEffect(() => {
+    db.collection('chats')
+      .doc(router.query.id)
+      .collection('messages')
+      .where('user', '!=', user.email)
+      .get()
+      .then((snapShots) => {
+        snapShots?.docs?.map((message, index) => {
+          if (message?.data()?.seen.includes(user.email)) {
+          } else {
+            snapShots.docs[index].ref.set(
+              {
+                seen: arrayUnion(user.email),
+              },
+              { merge: true }
+            )
+          }
+        })
+      })
+  }, [])
 
   return (
     <div className="flex">
