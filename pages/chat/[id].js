@@ -64,7 +64,7 @@ const ChatPage = ({ messages, chat, allUsers }) => {
         <Sidebar openSideBar={openSideBar} />
       </div>
 
-      <div className="max-h-screen flex-1">
+      <div className="max-h-screen overflow-hidden flex-1">
         <ChatScreen
           chat={chat}
           messages={messages}

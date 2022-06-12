@@ -58,7 +58,8 @@ const ChatScreen = ({
   const [sticker, setSticker] = useState('')
   const [emoji, setEmoji] = useState('')
   const [openProfileModal, setOpenProfileModal] = useState(false)
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  // const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+
   const FCMIds = [
     'c9VnvBsMcq0hrml_WLRd0a:APA91bHODMM1bYg_0u48E2zpbV1bV-OgzX2-e51ewtNsYkmkv6NM8b0zBdgOThP07DeL-tM4M9KUd2ecohtm4Z1SkWGok-OnysgQd1w4y6XCoOSR0mJGXc-9D6oU2svp_njAZOJjcxY-',
     'c0G5E4l5HunToNLdRy9KUH:APA91bEAgfEP_Xfu3w4dSeBaoZY4M4FyUOPob33ZUsts3EfzpqiV3eT-dIDkswYO7dNdBlG8jaJ-_MIU9vXN3xAE668JIwdHHb2fSxyif52D8MY0TJKYfA9frAw2pPd3Vr8TgOCMZlvR',
@@ -182,6 +183,7 @@ const ChatScreen = ({
         photoURL: user.photoURL,
         type: type,
         seen: [],
+        reactions: [],
       })
 
     // if (user) {
@@ -270,7 +272,10 @@ const ChatScreen = ({
                   )}
                 </div>
               ) : (
+                // Message bubble section
+
                 <div className={`flex items-end`} key={message.id}>
+                  {/* Avatar section */}
                   {(isSameSender(
                     messagesSnapshot.docs,
                     message,
@@ -283,7 +288,9 @@ const ChatScreen = ({
                       user.email
                     )) && <Avatar src={message.data().photoURL}></Avatar>}
 
+                  {/* Message bubble */}
                   <div
+                    on
                     style={{
                       marginLeft: isSameSenderMargin(
                         messagesSnapshot.docs,
@@ -300,10 +307,11 @@ const ChatScreen = ({
                         ? 0
                         : 60,
                     }}
-                    className={`${
-                      user.email === message.data().user ? 'ml-auto' : 'flex-1'
+                    className={`relative ${
+                      user.email === message.data().user ? 'ml-auto ' : 'flex-1'
                     } `}
                   >
+                    {/* Render nickname */}
                     {!isSameUser(
                       messagesSnapshot.docs,
                       message,
@@ -320,8 +328,10 @@ const ChatScreen = ({
                       key={message.id}
                       user={message.data().user}
                       chat_theme={chatsSnapshot?.docs?.[0]?.data().theme}
+                      chat_document={router.query.id}
                       message={{
                         ...message.data(),
+                        id: message.id,
                         timestamp: message.data().timestamp?.toDate().getTime(),
                       }}
                     />
@@ -404,7 +414,7 @@ const ChatScreen = ({
         )})`,
         // backgroundSize: 'auto auto',
       }}
-      className="relative overflow-hidden scrollbar-hide bg-no-repeat bg-center bg-cover"
+      className="relative overflow-hidden h-screen scrollbar-hide bg-no-repeat bg-center bg-cover"
     >
       <div
         className={`${
@@ -481,12 +491,12 @@ const ChatScreen = ({
       </div>
 
       {/* Send message box */}
-      {showEmojiPicker && (
+      {/* {showEmojiPicker && (
         <Picker
           pickerStyle={{ width: '70%', position: 'fixed', bottom: 80 }}
           onEmojiClick={emojiPick}
         />
-      )}
+      )} */}
 
       <div
         className={`flex h-[100px] bg-gray-100 w-full overflow-x-auto fixed bottom-[64px] ${
@@ -505,7 +515,7 @@ const ChatScreen = ({
 
       {/* sending message bar */}
       <div
-        className={`fixed bottom-0 ${
+        className={`fixed bottom-0 z-[10] ${
           chatsSnapshot ? chatsSnapshot?.docs?.[0]?.data().theme : 'bg-white'
         } `}
       >

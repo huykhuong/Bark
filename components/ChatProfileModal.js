@@ -85,11 +85,14 @@ const ChatProfileModal = ({
 
     db.collection('chats').doc(chat.id).set(
       {
-        chat_name: chat.chat_name,
-        group_img_url: chat.group_img_url,
+        // chat_name: chat.chat_name,
+        // emoji: chat.emoji,
+        // theme: chat.theme,
+        // isTyping: chat.isTyping,
+        // group_img_url: chat.group_img_url,
         nicknames: temp,
-        type: chat.type,
-        users: chat.users,
+        // type: chat.type,
+        // users: chat.users,
       },
       { merge: true }
     )
