@@ -186,35 +186,35 @@ const ChatScreen = ({
         reactions: [],
       })
 
-    // if (user) {
-    //   ;(async () => {
-    //     const rawResponse = await fetch('https://fcm.googleapis.com/fcm/send', {
-    //       method: 'POST',
-    //       headers: {
-    //         Authorization:
-    //           'key=AAAA7vd6DQ0:APA91bEtr_y72o20kjVpbnOjCojPrFc_UQo-zGnBm4qlxchXpaXYf4ZQKbrKBUhsTxTIF15m1VfYZQGnlesr5fkkzxi4qUgs_firc3j03iYZBeTkpU8JiWBIRBlYldhOJiAQMYYWsyPm',
-    //         'Content-Type': 'application/json',
-    //       },
-    //       body: JSON.stringify({
-    //         notification: {
-    //           title: 'Bark',
-    //           body: `${renderNickname(nicknamesArray, user.email)}: ${input}`,
-    //           icon: '/favicon.ico',
-    //         },
+    if (user) {
+      ;(async () => {
+        const rawResponse = await fetch('https://fcm.googleapis.com/fcm/send', {
+          method: 'POST',
+          headers: {
+            Authorization:
+              'key=AAAA7vd6DQ0:APA91bEtr_y72o20kjVpbnOjCojPrFc_UQo-zGnBm4qlxchXpaXYf4ZQKbrKBUhsTxTIF15m1VfYZQGnlesr5fkkzxi4qUgs_firc3j03iYZBeTkpU8JiWBIRBlYldhOJiAQMYYWsyPm',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            notification: {
+              title: 'Bark',
+              body: `${renderNickname(nicknamesArray, user.email)}: ${input}`,
+              icon: '/favicon.ico',
+            },
 
-    //         registration_ids: filterFCMId(
-    //           FCMIds,
-    //           await localforage.getItem('fcm_token')
-    //         ),
-    //         priority: 'high',
-    //         click_action: `https://bark-eight.vercel.app/chat/${chat.id}`,
-    //       }),
-    //     })
+            registration_ids: filterFCMId(
+              FCMIds,
+              await localforage.getItem('fcm_token')
+            ),
+            priority: 'high',
+            click_action: `https://bark-eight.vercel.app/chat/${chat.id}`,
+          }),
+        })
 
-    //     // const content = await rawResponse.json();
-    //     // console.log(content);
-    //   })()
-    // }
+        // const content = await rawResponse.json();
+        // console.log(content);
+      })()
+    }
 
     triggerBarkSound()
     setInput('')
