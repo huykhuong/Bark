@@ -47,6 +47,7 @@ const ChatProfileModal = ({
       user: userEmail,
       photoURL: userPhotoURL,
       nickname: nickname,
+      reactions: [],
     })
 
     scrollToBottom()

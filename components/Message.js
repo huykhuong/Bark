@@ -74,7 +74,7 @@ const Message = ({ user, message, chat_document, chat_theme }) => {
         <div
           className={`${
             messageExpanded ? 'inline' : 'hidden'
-          } fixed top-0 bottom-0 right-0 left-0 bg-transparent z-[1]`}
+          } fixed top-0 bottom-0 right-0 left-0 bg-black z-[1]`}
         ></div>
         <div
           className={`${
@@ -125,7 +125,7 @@ const Message = ({ user, message, chat_document, chat_theme }) => {
   }
 
   return (
-    <div>
+    <div className="relative">
       {message.type === 'text' ? (
         <p
           onClick={() => setMessageExpanded((prevValue) => !prevValue)}
@@ -142,19 +142,6 @@ const Message = ({ user, message, chat_document, chat_theme }) => {
           >
             {message.timestamp ? moment(message.timestamp).calendar() : ''}
           </span>
-          {/* Reactions lists */}
-          {message.reactions.length === 0 ? null : (
-            <div
-              onClick={() => {
-                setMessageReactionBoxExpanded((prevValue) => !prevValue)
-              }}
-              className={`${
-                messageReactionBoxExpanded ? 'h-[100px]' : 'h-6'
-              } flex items-center p-1 w-fit  bg-white rounded-lg absolute -bottom-2 -right-2`}
-            >
-              {message.reactions.map((reaction) => reaction.emoji)}
-            </div>
-          )}
         </p>
       ) : message.type === 'sticker' ? (
         <div
@@ -175,12 +162,6 @@ const Message = ({ user, message, chat_document, chat_theme }) => {
           >
             {message.timestamp ? moment(message.timestamp).calendar() : ''}
           </span>
-          {/* Reactions lists */}
-          {message.reactions.length === 0 ? null : (
-            <div className="flex items-center p-1 w-fit h-6 bg-white rounded-lg absolute -bottom-2 -right-2">
-              {message.reactions.map((reaction) => reaction.emoji)}
-            </div>
-          )}
         </div>
       ) : message.type === 'emoji' ? (
         <p
@@ -196,12 +177,6 @@ const Message = ({ user, message, chat_document, chat_theme }) => {
           >
             {message.timestamp ? moment(message.timestamp).calendar() : ''}
           </span>
-          {/* Reactions lists */}
-          {message.reactions.length === 0 ? null : (
-            <div className="flex items-center p-1 w-fit h-6 bg-white rounded-lg absolute -bottom-2 -right-2">
-              {message.reactions.map((reaction) => reaction.emoji)}
-            </div>
-          )}
         </p>
       ) : (
         <div
@@ -219,12 +194,19 @@ const Message = ({ user, message, chat_document, chat_theme }) => {
           >
             {message.timestamp ? moment(message.timestamp).calendar() : ''}
           </span>
-          {/* Reactions lists */}
-          {message.reactions.length === 0 ? null : (
-            <div className="flex items-center p-1 w-fit h-6 bg-white rounded-lg absolute -bottom-2 -right-2">
-              {message.reactions.map((reaction) => reaction.emoji)}
-            </div>
-          )}
+        </div>
+      )}
+      {/* Reactions lists */}
+      {message.reactions.length === 0 ? null : (
+        <div
+          onClick={() => {
+            setMessageReactionBoxExpanded((prevValue) => !prevValue)
+          }}
+          className={`${
+            messageReactionBoxExpanded ? 'h-[100px]' : 'h-6'
+          } flex items-center p-1 min-w-0 bg-white rounded-lg absolute z-[10] -bottom-2 -right-2`}
+        >
+          {message.reactions.map((reaction) => reaction.emoji)}
         </div>
       )}
     </div>
