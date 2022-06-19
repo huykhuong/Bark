@@ -332,8 +332,10 @@ const ChatScreen = ({
                       message={{
                         ...message.data(),
                         id: message.id,
+
                         timestamp: message.data().timestamp?.toDate().getTime(),
                       }}
+                      nicknamesArray={nicknamesArray}
                     />
                   </div>
                 </div>

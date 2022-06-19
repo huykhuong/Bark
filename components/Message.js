@@ -1,15 +1,24 @@
+import { Avatar } from '@material-ui/core'
 import { arrayUnion } from 'firebase/firestore'
 import moment from 'moment'
 import React, { useState } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { auth, db } from '../firebase'
+import { renderNickname } from '../utils/chatLogics'
 import { getGifImage } from '../utils/getGifImage'
 
-const Message = ({ user, message, chat_document, chat_theme }) => {
+const Message = ({
+  user,
+  message,
+  chat_document,
+  chat_theme,
+  nicknamesArray,
+}) => {
   const [userLoggedIn] = useAuthState(auth)
   const [messageExpanded, setMessageExpanded] = useState(false)
   const [messageReactionBoxExpanded, setMessageReactionBoxExpanded] =
     useState(false)
+  const [messageReactionsDetailBox, setMessageReactionsDetailBox] = useState([])
 
   const generalMessageStyle = `w-fit p-[15px] rounded-[8px] mt-[20px] ml-[10px] min-w-[70px] h-fit ${
     messageExpanded && 'pb-[40px]'
@@ -74,7 +83,7 @@ const Message = ({ user, message, chat_document, chat_theme }) => {
         <div
           className={`${
             messageExpanded ? 'inline' : 'hidden'
-          } fixed top-0 bottom-0 right-0 left-0 bg-black z-[1]`}
+          } fixed top-0 bottom-0 right-0 left-0 bg-transparent z-[2]`}
         ></div>
         <div
           className={`${
@@ -196,19 +205,49 @@ const Message = ({ user, message, chat_document, chat_theme }) => {
           </span>
         </div>
       )}
+
       {/* Reactions lists */}
       {message.reactions.length === 0 ? null : (
         <div
           onClick={() => {
+            setMessageReactionsDetailBox(message.reactions)
             setMessageReactionBoxExpanded((prevValue) => !prevValue)
           }}
-          className={`${
-            messageReactionBoxExpanded ? 'h-[100px]' : 'h-6'
-          } flex items-center p-1 min-w-0 bg-white rounded-lg absolute z-[10] -bottom-2 -right-2`}
+          className={`flex items-center h-6 p-1 min-w-0 bg-white rounded-lg absolute z-[1] -bottom-2 ${
+            userLoggedIn.email === user ? '-right-2' : 'left-2'
+          } `}
         >
           {message.reactions.map((reaction) => reaction.emoji)}
         </div>
       )}
+
+      {/* Reactions detail box  */}
+      {messageReactionBoxExpanded ? (
+        <>
+          <div
+            onClick={() => setMessageReactionBoxExpanded(false)}
+            className="fixed h-screen w-screen left-0 top-0 bg-black bg-opacity-50 z-[90]"
+          ></div>
+          <div
+            className={`fixed bottom-0 left-0 h-1/3 w-screen bg-white p-7 z-[100] rounded-t-2xl overflow-y-auto`}
+          >
+            <p className="italic text-[13px] mb-8">
+              Tap to remove your reaction
+            </p>
+            {messageReactionsDetailBox.length === 0
+              ? null
+              : messageReactionsDetailBox.map((reaction) => (
+                  <div className="flex mb-5">
+                    <div className="flex-1 flex items-center gap-x-5">
+                      <Avatar src={reaction.senderPhotoURL}></Avatar>
+                      {renderNickname(nicknamesArray, reaction.sender)}
+                    </div>
+                    <div className="text-[20px]">{reaction.emoji}</div>
+                  </div>
+                ))}
+          </div>
+        </>
+      ) : null}
     </div>
   )
 }
