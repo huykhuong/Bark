@@ -186,6 +186,7 @@ const ChatScreen = ({
         reactions: [],
       })
 
+    // FCM Section
     if (user) {
       ;(async () => {
         const rawResponse = await fetch('https://fcm.googleapis.com/fcm/send', {
@@ -332,7 +333,6 @@ const ChatScreen = ({
                       message={{
                         ...message.data(),
                         id: message.id,
-
                         timestamp: message.data().timestamp?.toDate().getTime(),
                       }}
                       nicknamesArray={nicknamesArray}

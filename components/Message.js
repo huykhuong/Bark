@@ -18,7 +18,6 @@ const Message = ({
   const [messageExpanded, setMessageExpanded] = useState(false)
   const [messageReactionBoxExpanded, setMessageReactionBoxExpanded] =
     useState(false)
-  const [messageReactionsDetailBox, setMessageReactionsDetailBox] = useState([])
 
   const generalMessageStyle = `w-fit p-[15px] rounded-[8px] mt-[20px] ml-[10px] min-w-[70px] h-fit ${
     messageExpanded && 'pb-[40px]'
@@ -29,8 +28,9 @@ const Message = ({
   const imageStyle = 'bg-transparent pb-5'
   const receiverStickerStyle = 'text-left'
 
+  //Remove reaction function
   const removeReaction = (emoji, sender) => {
-    if (userLoggedIn !== sender) {
+    if (userLoggedIn.email !== sender) {
       return
     } else {
       db.collection('chats')
@@ -111,7 +111,7 @@ const Message = ({
             messageExpanded ? 'inline-flex' : 'hidden'
           } flex items-center space-x-3 absolute -top-[35px] ${
             userLoggedIn.email === user ? '-right-3' : '-left-11'
-          } z-[1] h-[50px] w-fit rounded-lg bg-white p-3`}
+          } z-[3] h-[50px] w-fit rounded-lg bg-white p-3`}
         >
           <span
             onClick={() => updateEmojiReaction('❤️')}
@@ -231,7 +231,6 @@ const Message = ({
       {message.reactions.length === 0 ? null : (
         <div
           onClick={() => {
-            setMessageReactionsDetailBox(message.reactions)
             setMessageReactionBoxExpanded((prevValue) => !prevValue)
           }}
           className={`flex items-center h-6 p-1 min-w-0 bg-white rounded-lg absolute z-[1] -bottom-2 ${
@@ -252,10 +251,12 @@ const Message = ({
           <div
             className={`fixed bottom-0 left-0 h-1/3 w-screen bg-white p-7 z-[100] rounded-t-2xl overflow-y-auto`}
           >
-            {messageReactionsDetailBox.length === 0
+            {message.reactions.length === 0
               ? null
-              : messageReactionsDetailBox.map((reaction) => (
+              : message.reactions.map((reaction, index) => (
+                  // Start of reaction detail list tile
                   <div
+                    key={index}
                     onClick={() =>
                       removeReaction(reaction.emoji, reaction.sender)
                     }
