@@ -1,5 +1,5 @@
 import { Avatar } from '@material-ui/core'
-import { arrayUnion } from 'firebase/firestore'
+import { arrayRemove, arrayUnion } from 'firebase/firestore'
 import moment from 'moment'
 import React, { useState } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
@@ -28,6 +28,27 @@ const Message = ({
   const receiverStyle = 'text-left bg-blue-200'
   const imageStyle = 'bg-transparent pb-5'
   const receiverStickerStyle = 'text-left'
+
+  const removeReaction = (emoji, sender) => {
+    if (userLoggedIn !== sender) {
+      return
+    } else {
+      db.collection('chats')
+        .doc(chat_document)
+        .collection('messages')
+        .doc(message.id)
+        .set(
+          {
+            reactions: arrayRemove({
+              emoji: emoji,
+              sender: userLoggedIn.email,
+              senderPhotoURL: userLoggedIn.photoURL,
+            }),
+          },
+          { merge: true }
+        )
+    }
+  }
 
   const updateEmojiReaction = async (emoji) => {
     const messageDoc = await db
@@ -231,16 +252,25 @@ const Message = ({
           <div
             className={`fixed bottom-0 left-0 h-1/3 w-screen bg-white p-7 z-[100] rounded-t-2xl overflow-y-auto`}
           >
-            <p className="italic text-[13px] mb-8">
-              Tap to remove your reaction
-            </p>
             {messageReactionsDetailBox.length === 0
               ? null
               : messageReactionsDetailBox.map((reaction) => (
-                  <div className="flex mb-5">
+                  <div
+                    onClick={() =>
+                      removeReaction(reaction.emoji, reaction.sender)
+                    }
+                    className="flex items-center mb-5"
+                  >
                     <div className="flex-1 flex items-center gap-x-5">
                       <Avatar src={reaction.senderPhotoURL}></Avatar>
-                      {renderNickname(nicknamesArray, reaction.sender)}
+                      <div>
+                        <p>{renderNickname(nicknamesArray, reaction.sender)}</p>
+                        {userLoggedIn.email === reaction.sender && (
+                          <p className="italic text-[13px]">
+                            Tap to remove your reaction
+                          </p>
+                        )}
+                      </div>
                     </div>
                     <div className="text-[20px]">{reaction.emoji}</div>
                   </div>
