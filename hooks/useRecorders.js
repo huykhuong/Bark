@@ -119,7 +119,7 @@ export default function useRecorder(sendMessage) {
       }
 
       recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' })
+        const blob = new Blob(chunks, { type: 'audio/x-wav' })
         chunks = []
 
         setRecorderState((prevState) => {
