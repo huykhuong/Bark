@@ -208,6 +208,22 @@ const Message = ({
             {message.timestamp ? moment(message.timestamp).calendar() : ''}
           </span>
         </p>
+      ) : message.type === 'voice' ? (
+        <audio
+          controls="controls"
+          onClick={() => setMessageExpanded((prevValue) => !prevValue)}
+          src={message.message}
+          className="mt-10"
+        >
+          <EmojiReactionBar />
+          <span
+            className={`${
+              messageExpanded ? 'visible' : 'invisible'
+            } text-gray opacity-70 p-[10px] text-[9px] absolute bottom-0 text-right right-0`}
+          >
+            {message.timestamp ? moment(message.timestamp).calendar() : ''}
+          </span>
+        </audio>
       ) : (
         <div
           onClick={() => setMessageExpanded((prevValue) => !prevValue)}

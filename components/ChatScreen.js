@@ -37,6 +37,8 @@ import { isTypingArrayInclude } from '../utils/isTypingArrayInclude'
 import { getIsTypingAvatar } from '../utils/getIsTypingAvatar'
 import TypingDots from './TypingDots'
 import StackedAvatar from './StackedAvatarList'
+import RecorderControls from './recorder-controls'
+import useRecorder from '../hooks/useRecorders'
 const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false })
 
 const ChatScreen = ({
@@ -58,6 +60,7 @@ const ChatScreen = ({
   const [sticker, setSticker] = useState('')
   const [emoji, setEmoji] = useState('')
   const [openProfileModal, setOpenProfileModal] = useState(false)
+  const [openRecorder, setOpenRecorder] = useState(false)
   // const [showEmojiPicker, setShowEmojiPicker] = useState(false)
 
   const FCMIds = [
@@ -156,7 +159,7 @@ const ChatScreen = ({
   }, [emoji])
 
   //send message function
-  const sendMessage = (e, type) => {
+  const sendMessage = (e, type, voiceFile) => {
     e.preventDefault()
 
     db.collection('users').doc(user.uid).set(
@@ -178,6 +181,8 @@ const ChatScreen = ({
             ? sticker
             : type === 'emoji'
             ? emoji
+            : type === 'voice'
+            ? voiceFile
             : imageURL,
         user: user.email,
         photoURL: user.photoURL,
@@ -187,35 +192,35 @@ const ChatScreen = ({
       })
 
     // FCM Section
-    if (user) {
-      ;(async () => {
-        const rawResponse = await fetch('https://fcm.googleapis.com/fcm/send', {
-          method: 'POST',
-          headers: {
-            Authorization:
-              'key=AAAA7vd6DQ0:APA91bEtr_y72o20kjVpbnOjCojPrFc_UQo-zGnBm4qlxchXpaXYf4ZQKbrKBUhsTxTIF15m1VfYZQGnlesr5fkkzxi4qUgs_firc3j03iYZBeTkpU8JiWBIRBlYldhOJiAQMYYWsyPm',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            notification: {
-              title: 'Bark',
-              body: `${renderNickname(nicknamesArray, user.email)}: ${input}`,
-              icon: '/favicon.ico',
-            },
+    // if (user) {
+    //   ;(async () => {
+    //     const rawResponse = await fetch('https://fcm.googleapis.com/fcm/send', {
+    //       method: 'POST',
+    //       headers: {
+    //         Authorization:
+    //           'key=AAAA7vd6DQ0:APA91bEtr_y72o20kjVpbnOjCojPrFc_UQo-zGnBm4qlxchXpaXYf4ZQKbrKBUhsTxTIF15m1VfYZQGnlesr5fkkzxi4qUgs_firc3j03iYZBeTkpU8JiWBIRBlYldhOJiAQMYYWsyPm',
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify({
+    //         notification: {
+    //           title: 'Bark',
+    //           body: `${renderNickname(nicknamesArray, user.email)}: ${input}`,
+    //           icon: '/favicon.ico',
+    //         },
 
-            registration_ids: filterFCMId(
-              FCMIds,
-              await localforage.getItem('fcm_token')
-            ),
-            priority: 'high',
-            click_action: `https://bark-eight.vercel.app/chat/${chat.id}`,
-          }),
-        })
+    //         registration_ids: filterFCMId(
+    //           FCMIds,
+    //           await localforage.getItem('fcm_token')
+    //         ),
+    //         priority: 'high',
+    //         click_action: `https://bark-eight.vercel.app/chat/${chat.id}`,
+    //       }),
+    //     })
 
-        // const content = await rawResponse.json();
-        // console.log(content);
-      })()
-    }
+    //     // const content = await rawResponse.json();
+    //     // console.log(content);
+    //   })()
+    // }
 
     triggerBarkSound()
     setInput('')
@@ -408,6 +413,8 @@ const ChatScreen = ({
 
   const emojiRef = useRef(null)
 
+  const { recorderState, ...handlers } = useRecorder(sendMessage)
+
   return (
     <div
       style={{
@@ -521,11 +528,18 @@ const ChatScreen = ({
           chatsSnapshot ? chatsSnapshot?.docs?.[0]?.data().theme : 'bg-white'
         } `}
       >
+        {/* Recorder Panel */}
+        <div className={`${openRecorder ? 'inline' : 'hidden'}`}>
+          <RecorderControls recorderState={recorderState} handlers={handlers} />
+        </div>
+
+        {/* Send Message and Media form */}
         <form className="w-screen flex items-center p-[10px] z-100 lg:w-[calc(100vw-388.625px)]">
-          {/* <InsertEmoticonIcon
+          <MicIcon
             className="cursor-pointer mr-3"
-            onClick={() => setShowEmojiPicker((value) => !value)}
-          /> */}
+            onClick={() => setOpenRecorder((prevValue) => !prevValue)}
+          />
+
           <ImageIcon
             className="cursor-pointer mr-3"
             onClick={() => imageUploadRef.current.click()}
@@ -576,8 +590,6 @@ const ChatScreen = ({
             ref={emojiRef}
             onClick={(e) => setEmoji(e.target.value)}
           ></input>
-
-          {/* <MicIcon /> */}
         </form>
       </div>
     </div>
